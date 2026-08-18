@@ -330,14 +330,28 @@ body {
   width: 100%;
   min-width: 0;
 }
-/* Gentle swap-in: incoming module fades + lifts a touch. Deliberately subtle
-   (no full glitch/reflow) so it reads as an operable console, not a refresh. */
+/* Module transition — the signature move. Incoming panel slides in; on a nav
+   change it ALSO runs the glitch (hard clip-path chop + horizontal jitter).
+   Both classes are present during a switch; `.glitching` is ordered last so it
+   wins the `animation` shorthand. Chrome around the panel never remounts, so
+   this reads as the console redrawing one module, not the page reloading. */
 .panel.anim {
-  animation: swap 0.22s ease both;
+  animation: swap 0.3s ease both;
 }
 @keyframes swap {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: none; }
+  0%   { opacity: 0; transform: translateX(-8px); }
+  100% { opacity: 1; transform: none; }
+}
+.panel.glitching {
+  animation: glitch 0.34s steps(2) both;
+}
+@keyframes glitch {
+  0%   { clip-path: inset(0 0 62% 0); transform: translateX(-8px); }
+  20%  { clip-path: inset(50% 0 18% 0); transform: translateX(8px); }
+  40%  { clip-path: inset(18% 0 44% 0); transform: translateX(-5px); }
+  60%  { clip-path: inset(66% 0 4% 0); transform: translateX(5px); }
+  80%  { clip-path: inset(8% 0 30% 0); transform: translateX(-2px); }
+  100% { clip-path: inset(0 0 0 0); transform: none; }
 }
 
 /* =========================================================================

@@ -30,6 +30,16 @@ export default function Frame({ active, onSelect, children }: FrameProps) {
   const isTouch = useIsTouch();
   const reduced = useReducedMotion();
 
+  /* Glitch on nav changes, not on first load. The panel carries key={active},
+     so every switch remounts a fresh DOM node and the animation replays from
+     0% — no timer or teardown needed; the animation's `both` fill leaves the
+     settled state fully visible. This ref just distinguishes the very first
+     paint (swap only) from later switches (swap + glitch). */
+  const mountedOnce = useRef(false);
+  useEffect(() => {
+    mountedOnce.current = true;
+  }, []);
+
   /* Mouse parallax — desktop pointers only, rAF-throttled, and skipped
      entirely when the user prefers reduced motion (§5, §6). */
   useEffect(() => {
@@ -138,7 +148,9 @@ export default function Frame({ active, onSelect, children }: FrameProps) {
             id="module-panel"
             role="tabpanel"
             aria-labelledby={`tab-${NAV[active].id}`}
-            className={`panel${reduced ? '' : ' anim'}`}
+            className={`panel${reduced ? '' : ' anim'}${
+              mountedOnce.current && !reduced ? ' glitching' : ''
+            }`}
             key={active}
           >
             {children}
