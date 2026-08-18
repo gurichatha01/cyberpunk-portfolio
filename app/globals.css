@@ -1023,6 +1023,232 @@ h1, h2, h3, h4, p {
 }
 
 /* =========================================================================
+   MODULE 03 · JOURNEY — signal trace
+   ========================================================================= */
+.scope {
+  position: relative;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, #080b11, #04060a);
+  padding: 14px 14px 8px;
+  margin-bottom: 18px;
+  overflow: hidden;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 14px) 0,
+    100% 14px,
+    100% 100%,
+    14px 100%,
+    0 calc(100% - 14px)
+  );
+}
+.shead {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  color: var(--mute);
+  margin-bottom: 6px;
+  gap: 10px;
+}
+.scope svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+/* drop-shadow is on this single path only (§6) */
+.trace {
+  fill: none;
+  stroke: var(--ac);
+  stroke-width: 1.6;
+  filter: drop-shadow(0 0 5px var(--ac));
+  stroke-dasharray: 4200;
+  stroke-dashoffset: 4200;
+  animation: draw 2.2s ease forwards;
+}
+@keyframes draw {
+  to { stroke-dashoffset: 0; }
+}
+.trace.ghost {
+  stroke: var(--magenta);
+  opacity: 0.26;
+  stroke-width: 1;
+  filter: none;
+  animation-delay: 0.08s;
+}
+.gridln {
+  stroke: #141a25;
+  stroke-width: 1;
+}
+.nodedot {
+  fill: #0a0e14;
+  stroke: var(--nc);
+  stroke-width: 2;
+  cursor: pointer;
+  transition: r 0.2s, fill 0.2s;
+}
+.nodedot.sel {
+  fill: var(--nc);
+}
+.nodetick {
+  stroke: #232b39;
+  stroke-width: 1;
+}
+.nodetick.sel {
+  stroke: var(--nc);
+  opacity: 0.5;
+  stroke-dasharray: 3 4;
+}
+.yr {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  fill: var(--mute);
+  letter-spacing: 0.1em;
+  /* hidden on small screens — trace is decoration there, chips are the control (§5) */
+  display: none;
+}
+.yr.sel {
+  fill: var(--nc);
+}
+
+.jrow {
+  display: flex;
+  gap: 7px;
+  margin-bottom: 18px;
+  /* mobile: chips are the primary control — horizontal scroll-snap row (§5) */
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+.jchip {
+  flex: none;
+  scroll-snap-align: start;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--mute);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  padding: 9px 12px;
+  cursor: pointer;
+  transition: color 0.16s, border-color 0.16s, background 0.16s, box-shadow 0.16s;
+  white-space: nowrap;
+}
+.jchip:hover {
+  color: var(--ink);
+  border-color: var(--jc);
+}
+.jchip.on {
+  color: var(--void);
+  background: var(--jc);
+  border-color: var(--jc);
+  box-shadow: 0 0 18px var(--jc);
+  font-weight: 700;
+}
+
+.era {
+  position: relative;
+  border: 1px solid var(--line);
+  background: linear-gradient(160deg, var(--panel), var(--panel2));
+  padding: 24px;
+  min-height: 300px; /* reserved to blunt the shift when swapping eras (§6) */
+  clip-path: polygon(
+    0 0,
+    calc(100% - 16px) 0,
+    100% 16px,
+    100% 100%,
+    16px 100%,
+    0 calc(100% - 16px)
+  );
+  animation: roIn 0.4s ease both;
+}
+.era::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--ac);
+  box-shadow: 0 0 18px var(--ac);
+}
+.era .top {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+.era .when {
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  color: var(--mute);
+}
+.era .org {
+  font-weight: 700;
+  font-size: clamp(26px, 8vw, 40px);
+  color: var(--ink);
+  line-height: 1.05;
+  margin: 4px 0 2px;
+}
+.era .rl {
+  color: var(--ac);
+  font-size: 12.5px;
+  letter-spacing: 0.14em;
+  text-shadow: 0 0 12px var(--ac);
+}
+.era .dur {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--mute);
+  border: 1px solid var(--line);
+  padding: 7px 11px;
+  white-space: nowrap;
+}
+.era p {
+  color: var(--text);
+  font-size: 13.5px;
+  line-height: 1.75;
+  max-width: 620px;
+  margin: 0 0 18px;
+}
+.era p b {
+  color: var(--ink);
+  font-weight: 500;
+}
+.augh {
+  font-size: 9.5px;
+  letter-spacing: 0.28em;
+  color: var(--mute);
+  margin-bottom: 9px;
+}
+.augs {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.aug {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  border: 1px solid var(--ac);
+  color: var(--ac);
+  padding: 6px 10px;
+  opacity: 0.9;
+  animation: augIn 0.3s ease both;
+}
+.aug:nth-child(2) { animation-delay: 0.05s; }
+.aug:nth-child(3) { animation-delay: 0.1s; }
+.aug:nth-child(4) { animation-delay: 0.15s; }
+.aug:nth-child(5) { animation-delay: 0.2s; }
+.aug:nth-child(6) { animation-delay: 0.25s; }
+@keyframes augIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 0.9; transform: none; }
+}
+
+/* =========================================================================
    BOOT overlay
    ========================================================================= */
 .boot {
@@ -1117,6 +1343,18 @@ h1, h2, h3, h4, p {
   .shelfrow {
     flex-wrap: wrap;
     overflow-x: visible;
+  }
+  /* JOURNEY: chips wrap instead of scroll on the desktop layout */
+  .jrow {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+}
+
+/* Year labels on the trace return once there's room (§5) */
+@media (min-width: 640px) {
+  .yr {
+    display: block;
   }
 }
 

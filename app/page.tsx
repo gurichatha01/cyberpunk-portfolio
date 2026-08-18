@@ -4,18 +4,15 @@ import { useCallback, useEffect, useState } from 'react';
 import Boot from '@/components/Boot';
 import Frame from '@/components/Frame';
 import Builds from '@/components/modules/Builds';
+import Journey from '@/components/modules/Journey';
 import Profile from '@/components/modules/Profile';
 import { NAV } from '@/content/nav';
+import { ERAS } from '@/content/journey';
 
 /* Placeholders for the modules not built yet (steps 3–5). PROFILE (index 0)
    is now real; the rest stay stand-ins so both navs remain fully wired.
    --ac recolours the panel accent per §3. */
 const PLACEHOLDER: Record<number, { tag: string; note: string; ac: string }> = {
-  2: {
-    tag: 'SIGNAL TRACE',
-    note: 'Career as an oscilloscope reading; amplitude grows 2019 → now. — coming in step 4.',
-    ac: 'var(--cyan)',
-  },
   3: {
     tag: 'ANALYSIS × SHIPPING',
     note: 'Grouped skill tags — DATA / SHIP KIT / EARLIER — plus education and certs. — coming in step 5.',
@@ -31,6 +28,8 @@ const PLACEHOLDER: Record<number, { tag: string; note: string; ac: string }> = {
 export default function Page() {
   const [active, setActive] = useState(0);
   const [booted, setBooted] = useState(false);
+  // era lives here so the selection persists across module switches
+  const [era, setEra] = useState(ERAS.length - 1);
 
   const select = useCallback((i: number) => {
     setActive((cur) => (cur === i ? cur : i));
@@ -61,6 +60,8 @@ export default function Page() {
           <Profile revealed={booted} onGo={select} />
         ) : active === 1 ? (
           <Builds />
+        ) : active === 2 ? (
+          <Journey era={era} setEra={setEra} />
         ) : (
           ph && (
             <section className="ph" style={{ ['--ac' as string]: ph.ac }}>
