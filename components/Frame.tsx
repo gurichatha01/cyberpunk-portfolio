@@ -21,10 +21,13 @@ function Clock() {
 interface FrameProps {
   active: number;
   onSelect: (i: number) => void;
+  /** module manages its own internal scrolling and should fill the viewport
+      exactly (JOURNEY's mobile spine) rather than growing with its content */
+  fill?: boolean;
   children: React.ReactNode;
 }
 
-export default function Frame({ active, onSelect, children }: FrameProps) {
+export default function Frame({ active, onSelect, fill, children }: FrameProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const desktopTabs = useRef<(HTMLButtonElement | null)[]>([]);
   const isTouch = useIsTouch();
@@ -98,7 +101,7 @@ export default function Frame({ active, onSelect, children }: FrameProps) {
       <span className="bracket br" />
       <div className="serial">PERSONNEL FILE · 0117-AX · CHATHA</div>
 
-      <div className="frame">
+      <div className={`frame${fill ? ' fill' : ''}`}>
         {/* topbar — collapses to one line on mobile */}
         <header className="topbar">
           <div className="grp">

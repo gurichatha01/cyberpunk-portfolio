@@ -55,7 +55,7 @@ export default function Page() {
   return (
     <>
       {!booted && <Boot onDone={() => setBooted(true)} />}
-      <Frame active={active} onSelect={select}>
+      <Frame active={active} onSelect={select} fill={active === 2}>
         {active === 0 ? (
           <Profile revealed={booted} onGo={select} />
         ) : active === 1 ? (

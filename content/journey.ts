@@ -8,6 +8,20 @@ export interface EraRun {
   b?: boolean;
 }
 
+/* Signal character of an era. These drive the waveform: the trace gets faster,
+   richer and louder as the career progresses, and the values interpolate
+   between adjacent eras so the line reads as one continuous signal. */
+export interface Signal {
+  /** base frequency */
+  freq: number;
+  /** how many harmonics ride on top (1–4) */
+  harm: number;
+  /** amplitude, 0–1 */
+  amp: number;
+  /** high-frequency jitter */
+  jit: number;
+}
+
 export interface Era {
   /** short year shown on the trace node */
   yr: string;
@@ -21,10 +35,27 @@ export interface Era {
   since?: string;
   /** accent colour, e.g. 'var(--cyan)' */
   nc: string;
+  /** raw hex of `nc` — the canvas/SVG needs a real colour, not a var() */
+  hex: string;
+  /** waveform character for this era */
+  sig: Signal;
   body: EraRun[];
   /** skills gained — the "augments installed" chips */
   augs: string[];
 }
+
+/** Module header. Kept short — "SIGNAL LOG" already labels the scope itself,
+    and a longer line wraps to two rows on a phone. */
+export const JOURNEY_HEADER = {
+  title: 'JOURNEY',
+  sub: 'HARDWARE → DATA → PRODUCT',
+};
+
+/** Footnote under the trace — the one-line reading of the whole signal. */
+export const JOURNEY_FOOTNOTE = {
+  desktop: 'ONE THING AT A TIME IN 2019 · FOUR AT ONCE NOW',
+  mobile: 'SCROLL TO ADVANCE · THE SIGNAL FILLS AS YOU GO',
+};
 
 export const ERAS: Era[] = [
   {
@@ -34,6 +65,8 @@ export const ERAS: Era[] = [
     role: 'B.TECH · ELECTRONIC & COMPUTER ENGINEERING',
     dur: '4 YRS',
     nc: 'var(--cyan)',
+    hex: '#00e5ff',
+    sig: { freq: 0.03, harm: 1, amp: 0.2, jit: 0.015 },
     body: [
       { t: 'Started in ' },
       { t: 'hardware', b: true },
@@ -52,6 +85,8 @@ export const ERAS: Era[] = [
     role: 'PRODUCT ANALYST · INTERN',
     dur: '8 MOS',
     nc: 'var(--green)',
+    hex: '#22f5a8',
+    sig: { freq: 0.052, harm: 2, amp: 0.38, jit: 0.035 },
     body: [
       { t: "First contact with real product data, at India's #1 parenting platform — " },
       { t: '10M+ users', b: true },
@@ -68,6 +103,8 @@ export const ERAS: Era[] = [
     role: 'DATA ANALYST · FULL-TIME',
     dur: '1 YR 2 MOS',
     nc: 'var(--green)',
+    hex: '#22f5a8',
+    sig: { freq: 0.078, harm: 2, amp: 0.58, jit: 0.06 },
     body: [
       { t: 'Owned analytics across ' },
       { t: 'supply chain and D2C logistics', b: true },
@@ -86,6 +123,8 @@ export const ERAS: Era[] = [
     role: 'DATA ANALYST · GCOC (APAC → AMS)',
     since: '2024-10',
     nc: 'var(--yellow)',
+    hex: '#fcee0a',
+    sig: { freq: 0.105, harm: 3, amp: 0.78, jit: 0.1 },
     body: [
       { t: 'Joined for ' },
       { t: 'APAC', b: true },
@@ -104,6 +143,8 @@ export const ERAS: Era[] = [
     role: 'INDIE PRODUCT BUILDER',
     dur: 'ONGOING',
     nc: 'var(--magenta)',
+    hex: '#ff2e6e',
+    sig: { freq: 0.14, harm: 4, amp: 1, jit: 0.16 },
     body: [
       { t: 'Stopped leaving things in a GitHub repo. Shipped ' },
       { t: "Aux'd", b: true },
