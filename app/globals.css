@@ -1,0 +1,489 @@
+/* =========================================================================
+   GURI//OS — global tokens + shared chrome
+   Authored MOBILE-FIRST (§5): base rules target the phone, `min-width`
+   queries add the desktop layer on top. No Tailwind, no libraries.
+   ========================================================================= */
+
+:root {
+  /* palette — §3, this is the whole palette, no additions */
+  --void: #05060a;
+  --panel: #0b0e15;
+  --panel2: #11151f;
+  --line: #1c2230;
+  --yellow: #fcee0a; /* system chrome / active state */
+  --cyan: #00e5ff;   /* secondary chrome */
+  --magenta: #ff2e6e;/* AUXD + indie era */
+  --green: #22f5a8;  /* LORES + Mylo era */
+  --ink: #e9edf5;
+  --mute: #5f6b80;   /* dim/decorative labels only (§7) */
+  --text: #aab3c4;   /* body copy — passes AA on --void (§7) */
+
+  /* fonts — variables provided by next/font in layout.tsx */
+  --font-display: 'Chakra Petch', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* mouse-parallax offset, driven by JS on desktop only; 0 on touch (§5) */
+  --px: 0;
+  --py: 0;
+
+  /* notch size for the signature clipped corners */
+  --notch: 9px;
+
+  /* mobile bottom-bar height, including the safe-area inset (§5) */
+  --bar-h: calc(58px + env(safe-area-inset-bottom, 0px));
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background: var(--void);
+  /* stop iOS rubber-banding from revealing a white gutter */
+  overscroll-behavior-y: none;
+}
+
+body {
+  font-family: var(--font-mono);
+  color: var(--ink);
+  background: var(--void);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.disp {
+  font-family: var(--font-display);
+}
+
+/* Focus rings — yellow, fits the aesthetic, never removed (§7) */
+:focus-visible {
+  outline: 2px solid var(--yellow);
+  outline-offset: 2px;
+}
+
+/* =========================================================================
+   Shell
+   ========================================================================= */
+.gos {
+  position: relative;
+  min-height: 100svh;
+  width: 100%;
+  overflow-x: hidden; /* belt-and-braces; real overflow is fixed at source */
+  background:
+    radial-gradient(120% 90% at 50% -10%, #0c1020 0%, var(--void) 60%),
+    var(--void);
+  color: var(--ink);
+}
+
+/* =========================================================================
+   FX overlays — cheap, non-interactive. Mobile gets the lighter treatment (§5).
+   ========================================================================= */
+.fx {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+}
+.fx.scan {
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.28) 3px,
+    rgba(0, 0, 0, 0) 4px
+  );
+  mix-blend-mode: multiply;
+  opacity: 0.3; /* mobile default — bumped to 0.5 on desktop */
+}
+.fx.glow {
+  background: radial-gradient(
+    90% 60% at 50% 40%,
+    rgba(0, 229, 255, 0.05),
+    transparent 70%
+  );
+}
+.fx.vig {
+  box-shadow: inset 0 0 200px 40px rgba(0, 0, 0, 0.9);
+}
+/* Full-screen flicker is desktop-only (§5) — see min-width block below. */
+.fx.flick {
+  display: none;
+}
+@keyframes flick {
+  0%, 97% { opacity: 0; }
+  97.5% { opacity: 0.015; }
+  98% { opacity: 0; }
+  98.5% { opacity: 0.02; }
+  99% { opacity: 0; }
+}
+
+/* Corner brackets */
+.bracket {
+  position: fixed;
+  width: 22px;
+  height: 22px;
+  z-index: 55;
+  border: 2px solid var(--yellow);
+  box-shadow: 0 0 12px rgba(252, 238, 10, 0.5);
+  pointer-events: none;
+}
+.bracket.tl { top: 14px; left: 14px; border-right: 0; border-bottom: 0; }
+.bracket.tr { top: 14px; right: 14px; border-left: 0; border-bottom: 0; }
+.bracket.bl { bottom: 14px; left: 14px; border-right: 0; border-top: 0; }
+.bracket.br { bottom: 14px; right: 14px; border-left: 0; border-top: 0; }
+
+/* Vertical serial — desktop only (hidden on small screens) */
+.serial {
+  display: none;
+  position: fixed;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%) rotate(180deg);
+  writing-mode: vertical-rl;
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  color: var(--mute);
+  z-index: 40;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* =========================================================================
+   Frame + topbar
+   ========================================================================= */
+.frame {
+  position: relative;
+  z-index: 10;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  padding: 34px 20px;
+  /* leave room for the fixed mobile bottom bar so content never hides behind it */
+  padding-bottom: calc(var(--bar-h) + 20px);
+  /* parallax is applied to the frame; values are 0 unless JS drives them */
+  transform: translate(calc(var(--px) * -6px), calc(var(--py) * -6px));
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--mute);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 10px;
+  white-space: nowrap;
+}
+.topbar .brand {
+  color: var(--yellow);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-shadow: 0 0 10px rgba(252, 238, 10, 0.55);
+}
+.topbar .grp {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+/* hidden on the one-line mobile bar, shown on desktop */
+.topbar .opt {
+  display: none;
+}
+.dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  margin-right: 6px;
+  animation: pulse 1.6s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* =========================================================================
+   Navigation
+   Desktop: inline tab row under the topbar (hidden < 768).
+   Mobile:  fixed bottom bar (hidden >= 768).
+   ========================================================================= */
+
+/* --- desktop tab row --- */
+.nav-desktop {
+  display: none; /* shown at >=768 */
+  gap: 6px;
+  margin: 24px 0 26px;
+  flex-wrap: wrap;
+}
+.tab {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--mute);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  padding: 9px 17px;
+  cursor: pointer;
+  transition: color 0.18s, border-color 0.18s, background 0.18s, box-shadow 0.18s;
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--notch)) 0,
+    100% var(--notch),
+    100% 100%,
+    var(--notch) 100%,
+    0 calc(100% - var(--notch))
+  );
+}
+.tab .k {
+  font-size: 10px;
+  color: var(--line);
+  margin-right: 8px;
+}
+.tab:hover {
+  color: var(--ink);
+  border-color: var(--cyan);
+}
+.tab[aria-selected='true'] {
+  color: var(--void);
+  background: var(--yellow);
+  border-color: var(--yellow);
+  box-shadow: 0 0 22px rgba(252, 238, 10, 0.45);
+}
+.tab[aria-selected='true'] .k {
+  color: rgba(5, 6, 10, 0.5);
+}
+
+/* --- mobile bottom bar --- */
+.nav-mobile {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 70;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  background: rgba(8, 11, 18, 0.94);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.mtab {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-right: 1px solid var(--line);
+  color: var(--mute);
+  font-family: var(--font-display);
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 58px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  transition: color 0.16s, background 0.16s;
+}
+.mtab:last-child {
+  border-right: 0;
+}
+.mtab .mk {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--line);
+}
+.mtab .ml {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+.mtab[aria-selected='true'] {
+  color: var(--void);
+  background: var(--yellow);
+}
+.mtab[aria-selected='true'] .mk {
+  color: rgba(5, 6, 10, 0.55);
+}
+
+/* =========================================================================
+   Stage — where the active module renders. Chrome around it stays mounted,
+   so switching modules is a content swap, not a page reload (user note).
+   ========================================================================= */
+.stage {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  position: relative;
+  padding: 4px 0;
+}
+.panel {
+  width: 100%;
+  min-width: 0;
+}
+/* Gentle swap-in: incoming module fades + lifts a touch. Deliberately subtle
+   (no full glitch/reflow) so it reads as an operable console, not a refresh. */
+.panel.anim {
+  animation: swap 0.22s ease both;
+}
+@keyframes swap {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* =========================================================================
+   Hint bar
+   ========================================================================= */
+.hint {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+  margin-top: 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--mute);
+  gap: 10px;
+}
+.hint .keys {
+  display: none; /* keyboard legend is desktop-only */
+}
+.hint .sk {
+  color: var(--yellow);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.hint .sk:hover {
+  text-shadow: 0 0 12px rgba(252, 238, 10, 0.6);
+}
+
+/* =========================================================================
+   Placeholder module blocks (step 1 only — real modules land in later steps).
+   ========================================================================= */
+.ph {
+  border: 1px solid var(--line);
+  background: linear-gradient(160deg, var(--panel), var(--panel2));
+  padding: 26px 22px;
+  min-height: 320px;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 16px) 0,
+    100% 16px,
+    100% 100%,
+    16px 100%,
+    0 calc(100% - 16px)
+  );
+  position: relative;
+}
+.ph::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--ac, var(--cyan));
+  box-shadow: 0 0 18px var(--ac, var(--cyan));
+}
+.ph .ph-no {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: var(--mute);
+}
+.ph .ph-h {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(38px, 12vw, 72px);
+  line-height: 1;
+  color: var(--ink);
+  margin: 6px 0 10px;
+}
+.ph .ph-tag {
+  color: var(--ac, var(--cyan));
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-shadow: 0 0 12px var(--ac, var(--cyan));
+}
+.ph .ph-note {
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.7;
+  max-width: 520px;
+  margin-top: 18px;
+}
+
+/* =========================================================================
+   DESKTOP LAYER  (>= 768px)
+   ========================================================================= */
+@media (min-width: 768px) {
+  .frame {
+    padding: 44px clamp(28px, 5vw, 90px);
+    padding-bottom: 44px; /* no bottom bar to clear on desktop */
+  }
+  .topbar {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    gap: 16px;
+    padding-bottom: 12px;
+  }
+  .topbar .grp {
+    gap: 20px;
+  }
+  .topbar .opt {
+    display: inline;
+  }
+  .serial {
+    display: block;
+  }
+  .fx.scan {
+    opacity: 0.5;
+  }
+  .fx.flick {
+    display: block;
+    background: #fff;
+    opacity: 0;
+    animation: flick 7s infinite steps(1);
+  }
+  .nav-desktop {
+    display: flex;
+  }
+  .nav-mobile {
+    display: none;
+  }
+  .hint {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+  }
+  .hint .keys {
+    display: inline;
+  }
+}
+
+/* =========================================================================
+   REDUCED MOTION (§6) — kill decorative animation, keep static end states.
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .frame {
+    transform: none !important;
+  }
+  .fx.flick {
+    display: none !important;
+  }
+}
