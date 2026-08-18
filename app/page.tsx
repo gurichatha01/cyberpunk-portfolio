@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import Boot from '@/components/Boot';
 import Frame from '@/components/Frame';
+import Builds from '@/components/modules/Builds';
 import Profile from '@/components/modules/Profile';
 import { NAV } from '@/content/nav';
 
@@ -10,11 +11,6 @@ import { NAV } from '@/content/nav';
    is now real; the rest stay stand-ins so both navs remain fully wired.
    --ac recolours the panel accent per §3. */
 const PLACEHOLDER: Record<number, { tag: string; note: string; ac: string }> = {
-  1: {
-    tag: 'TAPE DECK',
-    note: 'Insert a cassette, the deck seats it, reels spin, the readout decodes in. — coming in step 3.',
-    ac: 'var(--magenta)',
-  },
   2: {
     tag: 'SIGNAL TRACE',
     note: 'Career as an oscilloscope reading; amplitude grows 2019 → now. — coming in step 4.',
@@ -63,6 +59,8 @@ export default function Page() {
       <Frame active={active} onSelect={select}>
         {active === 0 ? (
           <Profile revealed={booted} onGo={select} />
+        ) : active === 1 ? (
+          <Builds />
         ) : (
           ph && (
             <section className="ph" style={{ ['--ac' as string]: ph.ac }}>

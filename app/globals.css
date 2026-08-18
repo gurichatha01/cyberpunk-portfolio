@@ -566,6 +566,462 @@ h1, h2, h3, h4, p {
   box-shadow: none;
 }
 
+/* Shared section headers (BUILDS / JOURNEY / STACK / TRANSMIT) */
+.sec-h {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(30px, 8vw, 46px);
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.sec-sub {
+  color: var(--mute);
+  font-size: 11px;
+  letter-spacing: 0.26em;
+  margin-bottom: 24px;
+}
+
+/* =========================================================================
+   MODULE 02 · BUILDS — tape deck
+   Mobile: single column, deck -> shelf (horizontal scroll-snap) -> readout.
+   Desktop: deck+shelf column beside the readout.
+   ========================================================================= */
+.deckwrap {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+  align-items: start;
+}
+.deckcol {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  min-width: 0;
+}
+
+.deck {
+  position: relative;
+  border: 1px solid var(--line);
+  padding: 18px;
+  background: linear-gradient(165deg, #12161f, #080a10);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  clip-path: polygon(
+    0 0,
+    calc(100% - 16px) 0,
+    100% 16px,
+    100% 100%,
+    16px 100%,
+    0 calc(100% - 16px)
+  );
+}
+.dhead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--mute);
+  margin-bottom: 12px;
+}
+.pwr {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.led {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2a3040;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.led.on {
+  background: var(--ac);
+  box-shadow: 0 0 12px var(--ac), 0 0 24px var(--ac);
+}
+
+.slot {
+  position: relative;
+  height: 150px;
+  background: #04060a;
+  border: 1px solid #171d29;
+  overflow: hidden;
+  box-shadow: inset 0 6px 22px rgba(0, 0, 0, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.slotmouth {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: linear-gradient(#000, #0d1219);
+  border-bottom: 1px solid #1b2230;
+  z-index: 5;
+}
+.slotempty {
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: #2b3444;
+}
+
+/* ---- cassette (shared button + slot) ---- */
+.cass {
+  position: relative;
+  width: 224px;
+  height: 138px;
+  border-radius: 5px;
+  border: 1px solid #2c3442;
+  background: linear-gradient(160deg, #20262f, #0e1218);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  flex: none;
+  padding: 0;
+}
+.cassbtn {
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+}
+.cassbtn:hover:not(:disabled) {
+  transform: translateY(-6px) rotate(-1deg);
+  border-color: var(--ac);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.7);
+}
+.cassbtn:disabled {
+  cursor: default;
+}
+.cass .screw {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #39414f;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.8);
+}
+.cass .screw.a { top: 6px; left: 6px; }
+.cass .screw.b { top: 6px; right: 6px; }
+.cass .screw.c { bottom: 6px; left: 6px; }
+.cass .screw.d { bottom: 6px; right: 6px; }
+.cass .lbl {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  height: 52px;
+  background: linear-gradient(150deg, #e9e6dc, #c8c6bc);
+  border-radius: 2px;
+  padding: 6px 9px;
+  overflow: hidden;
+  display: block;
+}
+.cass .lbl .t {
+  display: block;
+  font-weight: 700;
+  font-size: 21px;
+  color: #12151b;
+  line-height: 1;
+}
+.cass .lbl .s {
+  display: block;
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  color: #5c5f66;
+  margin-top: 3px;
+}
+.cass .lbl .stripe {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: var(--ac);
+}
+.cass .win {
+  position: absolute;
+  bottom: 14px;
+  left: 12px;
+  right: 12px;
+  height: 52px;
+  background: #05070b;
+  border: 1px solid #262d39;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 10px;
+}
+.hub {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #39414f;
+  background: radial-gradient(circle, #0a0d12 34%, #1a1f28 36%);
+  position: relative;
+  flex: none;
+}
+.hub::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #2c3340 0 25%, #151a22 0 50%, #2c3340 0 75%, #151a22 0);
+}
+.hub.spin::after {
+  animation: spin 1.6s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.tape {
+  flex: 1;
+  height: 16px;
+  margin: 0 6px;
+  background: linear-gradient(#2a1d12, #160f08);
+  border-radius: 2px;
+}
+
+/* insert / eject transport animations — transform + opacity only */
+.cass.loading {
+  animation: insert 0.85s cubic-bezier(0.5, 0, 0.2, 1) forwards;
+}
+@keyframes insert {
+  0%   { transform: translateY(-120px) rotate(-6deg) scale(0.96); opacity: 0; }
+  30%  { opacity: 1; }
+  70%  { transform: translateY(6px) rotate(0) scale(1); }
+  85%  { transform: translateY(-2px); }
+  100% { transform: translateY(0); }
+}
+.cass.ejecting {
+  animation: eject 0.5s ease-in forwards;
+}
+@keyframes eject {
+  0%   { transform: none; opacity: 1; }
+  100% { transform: translateY(-130px) rotate(5deg); opacity: 0; }
+}
+
+.transport {
+  display: flex;
+  gap: 6px;
+  margin-top: 14px;
+}
+.tbtn {
+  flex: 1;
+  border: 1px solid var(--line);
+  background: #0a0e14;
+  color: var(--mute);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  padding: 12px 0;
+  cursor: pointer;
+  transition: border-color 0.16s, color 0.16s;
+}
+.tbtn:hover:not(:disabled) {
+  border-color: var(--ac);
+  color: var(--ac);
+}
+.tbtn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* VU meter — scaleY, never height (§6) */
+.vu {
+  display: flex;
+  gap: 3px;
+  align-items: flex-end;
+  height: 22px;
+  margin-top: 12px;
+}
+.vu i {
+  flex: 1;
+  height: 100%;
+  background: #1a2130;
+  transform-origin: bottom;
+  transform: scaleY(0.12);
+}
+.vu.live i {
+  background: var(--ac);
+  box-shadow: 0 0 8px var(--ac);
+  animation: vu 0.6s infinite alternate;
+}
+.vu.live i:nth-child(2n) { animation-duration: 0.42s; }
+.vu.live i:nth-child(3n) { animation-duration: 0.78s; }
+@keyframes vu {
+  from { transform: scaleY(0.12); }
+  to { transform: scaleY(1); }
+}
+
+/* ---- shelf ---- */
+.shelf {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.shelf .cap {
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  color: var(--mute);
+}
+.shelfrow {
+  display: flex;
+  gap: 16px;
+  /* mobile: keep cassettes large, swipe horizontally (§5) */
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
+}
+.shelfrow > * {
+  scroll-snap-align: start;
+}
+
+/* ---- readout ---- */
+.readout {
+  position: relative;
+  border: 1px solid var(--line);
+  background: linear-gradient(160deg, var(--panel), var(--panel2));
+  padding: 24px;
+  min-height: 300px; /* reserved so idle<->seated doesn't shift (§6) */
+  clip-path: polygon(
+    0 0,
+    calc(100% - 16px) 0,
+    100% 16px,
+    100% 100%,
+    16px 100%,
+    0 calc(100% - 16px)
+  );
+}
+.readout::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--ac);
+  box-shadow: 0 0 18px var(--ac);
+}
+.ro-idle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 260px;
+  gap: 10px;
+  color: #2f3849;
+  text-align: center;
+}
+.ro-idle .big {
+  font-size: 16px;
+  letter-spacing: 0.3em;
+  color: #39445a;
+}
+.ro-idle-sub {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+}
+.ro-in {
+  animation: roIn 0.45s ease both;
+}
+@keyframes roIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+.ro-mod {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: var(--mute);
+}
+.ro-h {
+  font-weight: 700;
+  font-size: clamp(34px, 10vw, 60px);
+  color: var(--ink);
+  line-height: 1;
+  margin: 4px 0;
+}
+.ro-tag {
+  color: var(--ac);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-shadow: 0 0 12px var(--ac);
+  margin-bottom: 18px;
+}
+.ro-p {
+  color: var(--text);
+  font-size: 13.5px;
+  line-height: 1.7;
+  max-width: 520px;
+  margin: 0 0 18px;
+}
+.ro-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.ro-cell {
+  border: 1px solid var(--line);
+  padding: 10px 12px;
+}
+.ro-cell span {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--mute);
+  margin-bottom: 4px;
+}
+.ro-cell b {
+  font-size: 12px;
+  color: var(--ink);
+  font-weight: 500;
+}
+.ro-stack {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+.ro-stack em {
+  font-style: normal;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  border: 1px solid var(--line);
+  padding: 5px 9px;
+  color: var(--mute);
+}
+.access {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  padding: 12px 22px;
+  border: 1px solid var(--ac);
+  color: var(--ac);
+  text-decoration: none;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 10px) 0,
+    100% 10px,
+    100% 100%,
+    10px 100%,
+    0 calc(100% - 10px)
+  );
+}
+.access:hover {
+  background: var(--ac);
+  color: var(--void);
+  box-shadow: 0 0 24px var(--ac);
+}
+
 /* =========================================================================
    BOOT overlay
    ========================================================================= */
@@ -653,6 +1109,14 @@ h1, h2, h3, h4, p {
   }
   .hint .keys {
     display: inline;
+  }
+  /* BUILDS: deck+shelf column beside the readout; shelf wraps instead of scrolls */
+  .deckwrap {
+    grid-template-columns: minmax(280px, 340px) 1fr;
+  }
+  .shelfrow {
+    flex-wrap: wrap;
+    overflow-x: visible;
   }
 }
 
