@@ -7,27 +7,17 @@ import Builds from '@/components/modules/Builds';
 import Journey from '@/components/modules/Journey';
 import Profile from '@/components/modules/Profile';
 import Stack from '@/components/modules/Stack';
+import Transmit from '@/components/modules/Transmit';
 import { NAV } from '@/content/nav';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { ERAS } from '@/content/journey';
-
-/* Placeholders for the modules not built yet (steps 3–5). PROFILE (index 0)
-   is now real; the rest stay stand-ins so both navs remain fully wired.
-   --ac recolours the panel accent per §3. */
-const PLACEHOLDER: Record<number, { tag: string; note: string; ac: string }> = {
-  4: {
-    tag: 'OPEN A CHANNEL',
-    note: 'Contact rows — real links only. — coming in step 5.',
-    ac: 'var(--cyan)',
-  },
-};
 
 export default function Page() {
   const [active, setActive] = useState(0);
   const [booted, setBooted] = useState(false);
   // era lives here so the selection persists across module switches
   const [era, setEra] = useState(ERAS.length - 1);
-  const stackMobile = useMediaQuery('(max-width: 860px)');
+  const compact = useMediaQuery('(max-width: 860px)');
 
   const select = useCallback((i: number) => {
     setActive((cur) => (cur === i ? cur : i));
@@ -47,13 +37,10 @@ export default function Page() {
     return () => window.removeEventListener('keydown', onKey);
   }, [select]);
 
-  const item = NAV[active];
-  const ph = PLACEHOLDER[active];
-
   return (
     <>
       {!booted && <Boot onDone={() => setBooted(true)} />}
-      <Frame active={active} onSelect={select} fill={active === 2 || (active === 3 && stackMobile)}>
+      <Frame active={active} onSelect={select} fill={active === 2 || active === 4 || (active === 3 && compact)}>
         {active === 0 ? (
           <Profile revealed={booted} onGo={select} />
         ) : active === 1 ? (
@@ -63,16 +50,7 @@ export default function Page() {
         ) : active === 3 ? (
           <Stack />
         ) : (
-          ph && (
-            <section className="ph" style={{ ['--ac' as string]: ph.ac }}>
-              <div className="ph-no">
-                MODULE {item.no} // {item.label}
-              </div>
-              <div className="ph-h disp">{item.label}</div>
-              <div className="ph-tag">{ph.tag}</div>
-              <p className="ph-note">{ph.note}</p>
-            </section>
-          )
+          <Transmit />
         )}
       </Frame>
     </>

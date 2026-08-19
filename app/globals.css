@@ -1817,6 +1817,266 @@ h1, h2, h3, h4, p {
 }
 
 /* =========================================================================
+   MODULE 05 · TRANSMIT — open comms channels (links only, no backend).
+   Each channel is a live signal readout; a terminal sign-off closes it out.
+   ========================================================================= */
+.tx {
+  display: flex;
+  flex-direction: column;
+}
+.panel.fill > .tx {
+  flex: 1;
+  min-height: 0;
+}
+.tx .sec-sub {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--green);
+}
+.live i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  animation: blink 1.5s infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.chan {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+  /* fill the space between header and sign-off; distribute the channels and
+     scroll internally only if a very short viewport can't hold them */
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  justify-content: space-between;
+}
+.ch {
+  position: relative;
+  display: grid;
+  grid-template-columns: 26px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--line);
+  background: linear-gradient(120deg, #0a0e15, #0b0e15);
+  padding: 15px 18px;
+  text-decoration: none;
+  color: var(--ink);
+  transition: border-color 0.18s, background 0.18s;
+  overflow: hidden;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 12px) 0,
+    100% 12px,
+    100% 100%,
+    12px 100%,
+    0 calc(100% - 12px)
+  );
+}
+.ch::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--cc);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.2s;
+}
+.ch:hover,
+.ch:focus-visible {
+  border-color: var(--cc);
+  background: linear-gradient(120deg, color-mix(in srgb, var(--cc) 9%, #0a0e15), #0b0e15);
+  outline: none;
+}
+.ch:hover::before,
+.ch:focus-visible::before {
+  transform: scaleY(1);
+}
+/* placeholder channel — inert, clearly not clickable */
+.ch.todo {
+  opacity: 0.5;
+  cursor: default;
+}
+.ch.todo .arrow {
+  visibility: hidden;
+}
+
+.ch .ico {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cc);
+}
+.ch .ico svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ch .mid {
+  min-width: 0;
+}
+.ch .mid .k {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  line-height: 1;
+}
+.ch .mid .v {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--mute);
+  margin-top: 4px;
+  word-break: break-all;
+}
+.ch:hover .mid .v,
+.ch:focus-visible .mid .v {
+  color: var(--cc);
+}
+
+.ch .rt {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+.ch .status {
+  font-size: 8.5px;
+  letter-spacing: 0.16em;
+  color: var(--cc);
+  white-space: nowrap;
+  opacity: 0.85;
+}
+.ch .rt-sig {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.bars {
+  display: flex;
+  gap: 2px;
+  align-items: flex-end;
+  height: 14px;
+}
+.bars i {
+  width: 3px;
+  background: var(--cc);
+  opacity: 0.85;
+  transform-origin: bottom;
+  animation: sig 1s infinite alternate;
+}
+.bars i:nth-child(1) { height: 35%; animation-delay: 0s; }
+.bars i:nth-child(2) { height: 60%; animation-delay: 0.12s; }
+.bars i:nth-child(3) { height: 85%; animation-delay: 0.24s; }
+.bars i:nth-child(4) { height: 100%; animation-delay: 0.36s; }
+@keyframes sig {
+  from { opacity: 0.3; transform: scaleY(0.75); }
+  to { opacity: 0.9; transform: scaleY(1); }
+}
+.arrow {
+  font-size: 15px;
+  color: var(--cc);
+  transition: transform 0.18s;
+}
+.ch:hover .arrow {
+  transform: translateX(3px);
+}
+
+/* narrow: keep each channel a compact single row — drop the decorative status
+   line and signal bars so the whole module fits the console with no scroll */
+@media (max-width: 520px) {
+  .ch {
+    gap: 12px;
+    padding: 12px 15px;
+  }
+  .ch .status,
+  .ch .bars {
+    display: none;
+  }
+  .signoff {
+    padding: 14px 16px;
+    line-height: 1.7;
+  }
+}
+
+/* terminal sign-off */
+.signoff {
+  border: 1px solid var(--line);
+  background: #04060a;
+  padding: 18px 20px;
+  font-size: 12px;
+  line-height: 1.9;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 14px) 0,
+    100% 14px,
+    100% 100%,
+    14px 100%,
+    0 calc(100% - 14px)
+  );
+}
+.signoff .l {
+  color: var(--mute);
+}
+.signoff .l .p {
+  color: var(--green);
+}
+.signoff .l b {
+  color: var(--ink);
+  font-weight: 400;
+}
+.signoff .end {
+  color: var(--yellow);
+  letter-spacing: 0.14em;
+}
+.cur {
+  display: inline-block;
+  width: 8px;
+  height: 15px;
+  background: var(--yellow);
+  margin-left: 3px;
+  vertical-align: -2px;
+  animation: cur 1.05s steps(1) infinite;
+}
+@keyframes cur {
+  50% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bars i,
+  .live i,
+  .cur {
+    animation: none;
+  }
+}
+
+/* =========================================================================
    BOOT overlay
    ========================================================================= */
 .boot {
@@ -1973,7 +2233,15 @@ h1, h2, h3, h4, p {
   font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: 0.04em;
-  margin: 6px 0 18px;
+  margin: 6px 0 10px;
+}
+.resume-doc .contact-line {
+  color: var(--mute);
+  font-size: 13px;
+  margin: 0 0 18px;
+}
+.resume-doc .summary {
+  color: var(--text);
 }
 .resume-doc h2 {
   font-family: var(--font-display);
