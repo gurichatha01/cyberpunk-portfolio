@@ -11,8 +11,6 @@ import {
   STACK_IDLE,
   byId,
 } from '@/content/stack';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 interface TracePath {
   id: string;
@@ -28,10 +26,6 @@ export default function Stack() {
 
   const boardRef = useRef<HTMLDivElement>(null);
   const chipRefs = useRef<Record<string, HTMLButtonElement | null>>({});
-  const readRef = useRef<HTMLDivElement>(null);
-
-  const stacked = useMediaQuery('(max-width: 860px)');
-  const reduced = useReducedMotion();
 
   const active = sel ? byId(sel) : null;
   const ac = active ? ERA[active.era].c : 'var(--cyan)';
@@ -95,31 +89,23 @@ export default function Stack() {
       });
     };
     window.addEventListener('resize', run);
-    const ro = new ResizeObserver(run);
     const board = boardRef.current;
-    if (board) ro.observe(board);
+    const ro = new ResizeObserver(run);
+    if (board) {
+      ro.observe(board);
+      board.addEventListener('scroll', run, { passive: true });
+    }
     return () => {
       window.removeEventListener('resize', run);
+      board?.removeEventListener('scroll', run);
       ro.disconnect();
     };
   }, [route]);
 
-  /* On the stacked layout the readout sits below the board, so a tap that only
-     changed something offscreen would read as broken (§5). Bring it into view. */
-  const select = useCallback(
-    (id: string | null) => {
-      setSel(id);
-      if (id && stacked) {
-        requestAnimationFrame(() => {
-          readRef.current?.scrollIntoView({
-            behavior: reduced ? 'auto' : 'smooth',
-            block: 'nearest',
-          });
-        });
-      }
-    },
-    [stacked, reduced]
-  );
+  /* The readout is always on screen (a fixed region below the board on mobile,
+     the side panel on desktop), so selecting only swaps its contents — nothing
+     scrolls. */
+  const select = useCallback((id: string | null) => setSel(id), []);
 
   return (
     <div className="st" style={{ ['--ac']: ac } as CSSProperties}>
@@ -172,7 +158,7 @@ export default function Stack() {
                       aria-pressed={on}
                       aria-label={`${c.name}, installed ${ERA[c.era].label}`}
                     >
-                      <i className="era" />
+                      <i className="eradot" />
                       {c.name}
                     </button>
                   );
@@ -183,7 +169,7 @@ export default function Stack() {
         </div>
 
         {/* ---------------- READOUT ---------------- */}
-        <div className="read" ref={readRef} style={{ ['--ac']: ac } as CSSProperties}>
+        <div className="read" style={{ ['--ac']: ac } as CSSProperties}>
           {!active ? (
             <div className="idle">
               <div className="b disp">{STACK_IDLE.big}</div>

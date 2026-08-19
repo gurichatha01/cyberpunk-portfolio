@@ -197,7 +197,7 @@ export const byId = (id: string) => ALL.find((c) => c.id === id);
 
 export const STACK_HEADER = {
   title: 'STACK',
-  sub: 'INSTALLED MODULES · TAP A CHIP TO TRACE IT',
+  sub: 'TAP A CHIP TO TRACE IT',
 };
 
 export const STACK_IDLE = {

@@ -8,6 +8,7 @@ import Journey from '@/components/modules/Journey';
 import Profile from '@/components/modules/Profile';
 import Stack from '@/components/modules/Stack';
 import { NAV } from '@/content/nav';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { ERAS } from '@/content/journey';
 
 /* Placeholders for the modules not built yet (steps 3–5). PROFILE (index 0)
@@ -26,6 +27,7 @@ export default function Page() {
   const [booted, setBooted] = useState(false);
   // era lives here so the selection persists across module switches
   const [era, setEra] = useState(ERAS.length - 1);
+  const stackMobile = useMediaQuery('(max-width: 860px)');
 
   const select = useCallback((i: number) => {
     setActive((cur) => (cur === i ? cur : i));
@@ -51,7 +53,7 @@ export default function Page() {
   return (
     <>
       {!booted && <Boot onDone={() => setBooted(true)} />}
-      <Frame active={active} onSelect={select} fill={active === 2}>
+      <Frame active={active} onSelect={select} fill={active === 2 || (active === 3 && stackMobile)}>
         {active === 0 ? (
           <Profile revealed={booted} onGo={select} />
         ) : active === 1 ? (

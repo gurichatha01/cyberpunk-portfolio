@@ -21,14 +21,15 @@ function Clock() {
 interface FrameProps {
   active: number;
   onSelect: (i: number) => void;
-  /** module manages its own internal scrolling and should fill the viewport
-      exactly (JOURNEY's mobile spine) rather than growing with its content */
+  /** the active module fills the stage exactly and scrolls internally
+      (JOURNEY always; STACK on mobile) instead of growing the stage */
   fill?: boolean;
   children: React.ReactNode;
 }
 
 export default function Frame({ active, onSelect, fill, children }: FrameProps) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const desktopTabs = useRef<(HTMLButtonElement | null)[]>([]);
   const isTouch = useIsTouch();
   const reduced = useReducedMotion();
@@ -42,6 +43,12 @@ export default function Frame({ active, onSelect, fill, children }: FrameProps) 
   useEffect(() => {
     mountedOnce.current = true;
   }, []);
+
+  /* Each module starts at the top of the stage — a fresh module shouldn't
+     inherit the previous one's scroll position. */
+  useEffect(() => {
+    stageRef.current?.scrollTo({ top: 0 });
+  }, [active]);
 
   /* Mouse parallax — desktop pointers only, rAF-throttled, and skipped
      entirely when the user prefers reduced motion (§5, §6). */
@@ -101,7 +108,7 @@ export default function Frame({ active, onSelect, fill, children }: FrameProps) 
       <span className="bracket br" />
       <div className="serial">PERSONNEL FILE · 0117-AX · CHATHA</div>
 
-      <div className={`frame${fill ? ' fill' : ''}`}>
+      <div className="frame">
         {/* topbar — collapses to one line on mobile */}
         <header className="topbar">
           <div className="grp">
@@ -114,7 +121,12 @@ export default function Frame({ active, onSelect, fill, children }: FrameProps) 
               ONLINE
             </span>
             <span className="opt">GURUGRAM · IN</span>
-            <Clock />
+            <span className="opt">
+              <Clock />
+            </span>
+            <a className="resume disp" href="/resume">
+              ▸ RÉSUMÉ
+            </a>
           </div>
         </header>
 
@@ -146,12 +158,12 @@ export default function Frame({ active, onSelect, fill, children }: FrameProps) 
         </nav>
 
         {/* the active module */}
-        <main className="stage">
+        <main className="stage" ref={stageRef}>
           <div
             id="module-panel"
             role="tabpanel"
             aria-labelledby={`tab-${NAV[active].id}`}
-            className={`panel${reduced ? '' : ' anim'}${
+            className={`panel${fill ? ' fill' : ''}${reduced ? '' : ' anim'}${
               mountedOnce.current && !reduced ? ' glitching' : ''
             }`}
             key={active}
@@ -160,12 +172,10 @@ export default function Frame({ active, onSelect, fill, children }: FrameProps) 
           </div>
         </main>
 
-        {/* hint bar */}
+        {/* hint bar — keyboard legend only (résumé lives in the topbar).
+            Hidden on mobile, where it would otherwise be an empty strip. */}
         <div className="hint">
           <span className="keys">[ 1–5 ] SWITCH MODULE · [ ← → ] SCRUB JOURNEY</span>
-          <a className="sk" href="/resume">
-            skip → plain résumé ▸
-          </a>
         </div>
       </div>
 
