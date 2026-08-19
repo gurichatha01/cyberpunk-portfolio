@@ -80,7 +80,7 @@ export const LOCATION = 'Gurugram, India';
 export const TRANSMIT_HEADER = { title: 'TRANSMIT', sub: 'OPEN CHANNELS' };
 
 export const SIGNOFF = {
-  prompt: 'guri@gcoc',
+  prompt: 'guri@console',
   whoami: 'gurmeherdeep singh chatha — analyst who ships',
   status: 'open to good problems, better teams, and anything worth building',
 };
