@@ -653,6 +653,272 @@ h1, h2, h3, h4, p {
   min-width: 0; /* grid items default to min-width:auto and can overflow */
 }
 
+/* =========================================================================
+   BUILDS — MOBILE (<=860): the cassette IS the container. No deck box, no
+   empty readout box. Tap a tape and it expands in place — reels spin, LED + VU
+   light, the readout unfolds inside the same card via grid-template-rows.
+   All scoped under .card/.tapes so nothing leaks into the desktop deck.
+   ========================================================================= */
+.tapes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.card {
+  position: relative;
+  border: 1px solid var(--line);
+  background: linear-gradient(160deg, #12161f, #080a10);
+  overflow: hidden;
+  transition: border-color 0.25s;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 14px) 0,
+    100% 14px,
+    100% 100%,
+    14px 100%,
+    0 calc(100% - 14px)
+  );
+}
+.card.open {
+  border-color: var(--ac);
+}
+.card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--ac);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.35s;
+  z-index: 3;
+}
+.card.open::before {
+  transform: scaleY(1);
+  box-shadow: 0 0 16px var(--ac);
+}
+
+/* the tape face is the button */
+.card .face {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  padding: 14px;
+  cursor: pointer;
+  text-align: left;
+  display: block;
+  color: inherit;
+  font: inherit;
+}
+
+.card .mcass {
+  position: relative;
+  display: block;
+  border-radius: 5px;
+  padding: 12px;
+  background: linear-gradient(160deg, #232a34, #0e1218);
+  border: 1px solid #2f3745;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+.card .screw {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #3d4552;
+}
+.card .screw.a { top: 6px; left: 6px; }
+.card .screw.b { top: 6px; right: 6px; }
+.card .screw.c { bottom: 6px; left: 6px; }
+.card .screw.d { bottom: 6px; right: 6px; }
+.card .mlbl {
+  position: relative;
+  display: block;
+  background: linear-gradient(150deg, #e9e6dc, #c6c4ba);
+  border-radius: 2px;
+  padding: 9px 12px 9px 16px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.card .mlbl .stripe {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: var(--ac);
+}
+.card .mlbl .t {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 24px;
+  color: #12151b;
+  line-height: 1;
+}
+.card .mlbl .s {
+  display: block;
+  font-size: 8px;
+  letter-spacing: 0.16em;
+  color: #5c5f66;
+  margin-top: 3px;
+}
+.card .mlbl .tag {
+  display: block;
+  font-size: 8.5px;
+  letter-spacing: 0.1em;
+  color: #3f434b;
+  margin-top: 5px;
+}
+.card .mwin {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 44px;
+  padding: 0 14px;
+  background: #05070b;
+  border: 1px solid #262d39;
+  border-radius: 3px;
+}
+.card .hub {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid #39414f;
+  flex: none;
+  background: radial-gradient(circle, #0a0d12 34%, #1a1f28 36%);
+  position: relative;
+}
+.card .hub::after {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #2c3340 0 25%, #151a22 0 50%, #2c3340 0 75%, #151a22 0);
+}
+.card.open .hub::after {
+  animation: spin 1.7s linear infinite;
+}
+.card .band {
+  flex: 1;
+  height: 13px;
+  background: linear-gradient(#2a1d12, #160f08);
+  border-radius: 2px;
+}
+
+/* status strip under the tape face */
+.card .strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+}
+.card .stat {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--mute);
+}
+.card .led {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #2a3040;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.card.open .led {
+  background: var(--ac);
+  box-shadow: 0 0 10px var(--ac);
+}
+.card .vu {
+  display: flex;
+  gap: 2px;
+  align-items: flex-end;
+  height: 14px;
+  flex: 1;
+  max-width: 120px;
+}
+.card .vu i {
+  flex: 1;
+  height: 100%;
+  background: #1a2130;
+  transform-origin: bottom;
+  transform: scaleY(0.16); /* transform, not height (§6) */
+}
+.card.open .vu i {
+  background: var(--ac);
+  animation: vum 0.55s infinite alternate;
+}
+.card.open .vu i:nth-child(2n) { animation-duration: 0.4s; }
+.card.open .vu i:nth-child(3n) { animation-duration: 0.72s; }
+@keyframes vum {
+  from { transform: scaleY(0.16); }
+  to { transform: scaleY(1); }
+}
+.card .hintx {
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: var(--ac);
+  white-space: nowrap;
+}
+
+/* Unfold the readout inside the card. The grid-rows 0fr->1fr technique collapses
+   to 0 in some engines when a descendant is a scroll container, so we animate
+   max-height to a JS-measured content height (--body-h) — same in-place unfold,
+   robust everywhere. Falls back to a generous max if the var isn't set. */
+.card .body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card.open .body {
+  max-height: var(--body-h, 720px);
+}
+.card .pad {
+  padding: 2px 14px 16px;
+}
+.card .ro-mod {
+  margin-bottom: 10px;
+}
+.card .ro-grid {
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+}
+.card .acts {
+  display: flex;
+  gap: 8px;
+}
+.card .acts .access {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 10px;
+  min-height: 48px;
+  margin: 0;
+}
+.card .ejectb {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--mute);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  padding: 0 16px;
+  min-height: 48px;
+  cursor: pointer;
+  transition: color 0.16s, border-color 0.16s;
+}
+.card .ejectb:hover {
+  border-color: var(--ac);
+  color: var(--ac);
+}
+
 .deck {
   position: relative;
   border: 1px solid var(--line);
