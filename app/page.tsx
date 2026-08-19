@@ -6,6 +6,7 @@ import Frame from '@/components/Frame';
 import Builds from '@/components/modules/Builds';
 import Journey from '@/components/modules/Journey';
 import Profile from '@/components/modules/Profile';
+import Stack from '@/components/modules/Stack';
 import { NAV } from '@/content/nav';
 import { ERAS } from '@/content/journey';
 
@@ -13,11 +14,6 @@ import { ERAS } from '@/content/journey';
    is now real; the rest stay stand-ins so both navs remain fully wired.
    --ac recolours the panel accent per §3. */
 const PLACEHOLDER: Record<number, { tag: string; note: string; ac: string }> = {
-  3: {
-    tag: 'ANALYSIS × SHIPPING',
-    note: 'Grouped skill tags — DATA / SHIP KIT / EARLIER — plus education and certs. — coming in step 5.',
-    ac: 'var(--green)',
-  },
   4: {
     tag: 'OPEN A CHANNEL',
     note: 'Contact rows — real links only. — coming in step 5.',
@@ -62,6 +58,8 @@ export default function Page() {
           <Builds />
         ) : active === 2 ? (
           <Journey era={era} setEra={setEra} />
+        ) : active === 3 ? (
+          <Stack />
         ) : (
           ph && (
             <section className="ph" style={{ ['--ac' as string]: ph.ac }}>

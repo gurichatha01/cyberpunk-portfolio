@@ -101,16 +101,55 @@ spinning hubs and tape between them.
 State machine: `idle → loading (860ms) → seated → ejecting (480ms) → idle`.
 Guard against double-taps mid-transition.
 
-### 03 JOURNEY — signal trace
-Career as an oscilloscope reading whose **amplitude grows from 2019 to now**
-(flat line → full waveform). Inline SVG, path generated in JS, drawn in via `stroke-dasharray`.
-Five era nodes on the trace; selecting one recolours the panel and swaps the era card.
-Each era lists **AUGMENTS INSTALLED** (skills gained) as accent-bordered chips.
-Controls: click node, click chip, arrow keys.
+### 03 JOURNEY — living signal trace
+**Reference implementation: `journey-v3.jsx`. Port it as-is — the maths is the design.**
 
-### 04 STACK
-Grouped skill tags — DATA / SHIP KIT / EARLIER — plus education and certs.
-**No percentage bars.** No self-rated proficiency numbers.
+Career as a live oscilloscope reading. Not a static line: it animates continuously and each
+era has its own **signal character**, so the wave visibly gets denser as the timeline advances.
+
+- Per-era signal params: `freq`, `harm` (harmonic count), `amp`, `jit`. 2019 = slow, clean,
+  1 harmonic. 2026 = fast, dense, 4 harmonics. Params **interpolate between eras** so the
+  waveform morphs continuously along its length.
+- **Node alignment is non-negotiable.** A window function `|sin(π·u·segments)|^0.55` multiplies
+  the amplitude, forcing a zero-crossing exactly at every era node. The wave necks to the axis
+  at each marker and swells between — five bursts of signal, one per era. This is what stops it
+  wandering off-axis and clipping the container edge.
+- **Sample step is measured in pixels** (~1.4px vertical, ~2px horizontal), never in fractions
+  of the domain. Fraction-based stepping aliases the dense end into a zigzag.
+- Use `vector-effect="non-scaling-stroke"` on every path and circle — the SVG uses
+  `preserveAspectRatio="none"` and would otherwise distort stroke widths.
+- Lit vs dim: the trace up to the current progress renders in the era accent with a glow; the
+  remainder renders dim grey. Advancing lights up more of the signal.
+- A white scan beam (a short lit segment) sweeps the full length on a ~3s loop.
+- **Animate by writing the `d` attribute via refs inside a single `requestAnimationFrame`
+  loop. Never drive this through React state** — a per-frame re-render will tank the page.
+- Under `prefers-reduced-motion`, render one static frame with `phase = 0`, omit the beam, and
+  cancel the loop entirely.
+
+Each era card lists **AUGMENTS INSTALLED** as accent-bordered chips.
+Desktop controls: click node, click chip. Mobile: scroll (see §5).
+
+### 04 STACK — circuit board
+**Reference implementation: `stack-v2.jsx`. Port it as-is.**
+
+The stack rendered as a circuit board. Each skill is an IC chip (notched body, pin decorations
+on both sides). Chips are grouped into three banks: DATA CORE, SHIP KIT, LEGACY/HARDWARE.
+
+- **Chips are coloured by the era they were installed in, using JOURNEY's exact palette**
+  (Thapar cyan, Mylo green, Criteo yellow, Shipping magenta). This makes STACK and JOURNEY read
+  as one system. Each chip carries a small era dot.
+- Tapping a chip powers it on, **routes PCB traces to every linked chip**, animates a white
+  signal pulse down the traces (`stroke-dasharray` flow), dims everything unrelated, and fills a
+  readout panel (one-line note, install era, link count, tappable "traced to" tags).
+- **Traces are measured from real chip positions via refs**, not hardcoded. Recompute on resize
+  and via a `ResizeObserver` on the board so wiring survives the mobile reflow. Route with
+  right-angle/45° corners like real PCB routing (Manhattan path with chamfered turns).
+- The cross-bank links (C→Python, SQL→PostgreSQL) are intentional — they're the
+  hardware→data→product throughline drawn as circuitry. Keep them.
+- **No percentage bars, no self-rated proficiency.** The interest is the graph, not a score.
+- Chip notes and links live in `content/stack.ts`. All notes are first-person, one line each.
+
+`prefers-reduced-motion`: keep static traces, drop the flowing-pulse animation.
 
 ### 05 TRANSMIT
 Contact rows. Real links only; no fake ones.
@@ -129,9 +168,24 @@ yellow fill. Keep the top status bar but drop to one line.
 (`scroll-snap-type: x mandatory`) so cassettes stay large and swipeable rather than shrinking.
 Readout stacks under the deck. Cassette min tap target 44×44 throughout.
 
-**Journey.** Keep the SVG trace (it scales), but **hide the year labels under 640px** and make
-the era chips a horizontal scroll-snap row — chips are the primary control on mobile, the trace
-is decoration there. Selected chip should `scrollIntoView({ block: 'nearest' })`.
+**Stack.** Board and readout stack to one column under 860px. Chip grid stays a wrapping grid
+(min chip ~84px) — traces recompute via the ResizeObserver so they stay aligned after reflow.
+Because the readout sits below the board on mobile, tapping a chip must bring it into view:
+make the readout **sticky** to the viewport bottom, or auto-scroll it into view on tap. A tap
+that changes nothing on screen reads as broken.
+
+**Journey.** Under 760px the trace **rotates vertical** — a signal spine running down the left
+(~66px column) with era nodes along it, and the era cards in a scrolling column beside it.
+Do not shrink the horizontal trace; a growth curve is unreadable in a 380px-wide strip.
+
+- Cards are a `scroll-snap-type: y mandatory` container with `scroll-snap-stop: always`, so one
+  flick advances exactly one era. Container height ~62vh, min 400px.
+- The lit portion of the spine tracks **raw scroll offset**, not the snapped index, so the
+  signal fills continuously under the thumb instead of jumping at each snap.
+- Active card is full opacity; the others drop to ~0.42 so the focused one reads clearly.
+- The scroll listener must be `{ passive: true }` and rAF-throttled, and must write to a ref —
+  it must not call `setState` on every scroll event.
+- Derive the active index from whichever card's centre is nearest the container centre.
 
 **Effects.**
 - Disable the mouse-parallax translate entirely on `(hover: none)` — it does nothing on touch

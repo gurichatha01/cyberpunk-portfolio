@@ -1348,6 +1348,369 @@ h1, h2, h3, h4, p {
 }
 
 /* =========================================================================
+   MODULE 04 · STACK — circuit board
+   The stack as a PCB. Chips are ICs coloured by install era; tapping one routes
+   traces (measured from real chip boxes) to its links and fills the readout.
+   Board + readout are two columns, stacking to one under 860px (§5).
+   ========================================================================= */
+.st-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* ---------- board ---------- */
+.board {
+  position: relative;
+  border: 1px solid var(--line);
+  padding: 16px 14px 14px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, #080c12, #050810),
+    repeating-linear-gradient(0deg, transparent 0 23px, #0d141d 23px 24px),
+    repeating-linear-gradient(90deg, transparent 0 23px, #0d141d 23px 24px);
+  clip-path: polygon(
+    0 0,
+    calc(100% - 16px) 0,
+    100% 16px,
+    100% 100%,
+    16px 100%,
+    0 calc(100% - 16px)
+  );
+}
+.board .bh {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--mute);
+  margin-bottom: 14px;
+  gap: 10px;
+}
+.board .bh b {
+  color: var(--ac);
+  font-weight: 500;
+}
+
+/* ---------- traces ---------- */
+.traces {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+}
+.tr {
+  fill: none;
+  stroke: var(--tc);
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  opacity: 0.55;
+  filter: drop-shadow(0 0 4px var(--tc));
+}
+/* white pulse running down the trace — the signal flow */
+.tr-flow {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  opacity: 0.75;
+  stroke-dasharray: 5 26;
+  animation: flow 0.9s linear infinite;
+}
+@keyframes flow {
+  to { stroke-dashoffset: -31; }
+}
+
+/* ---------- banks + chip grid ---------- */
+.bank {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 16px;
+}
+.bank:last-child {
+  margin-bottom: 0;
+}
+.bank .cap {
+  font-size: 9px;
+  letter-spacing: 0.28em;
+  color: var(--mute);
+  margin-bottom: 9px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.bank .cap::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+.chipgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 9px;
+}
+
+/* ---------- chip (IC) ---------- */
+.chip {
+  position: relative;
+  background: linear-gradient(160deg, #161b25, #0c1017);
+  border: 1px solid #232b3a;
+  color: #9dabbf;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  padding: 14px 6px;
+  min-height: 52px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: color 0.16s, border-color 0.16s, background 0.16s, box-shadow 0.16s, opacity 0.16s;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 7px) 0,
+    100% 7px,
+    100% 100%,
+    7px 100%,
+    0 calc(100% - 7px)
+  );
+}
+/* the IC pins down each side */
+.chip::before,
+.chip::after {
+  content: '';
+  position: absolute;
+  top: 9px;
+  bottom: 9px;
+  width: 3px;
+  background: repeating-linear-gradient(180deg, #39424f 0 3px, transparent 3px 7px);
+  transition: background 0.16s;
+}
+.chip::before {
+  left: -3px;
+}
+.chip::after {
+  right: -3px;
+}
+.chip:hover {
+  color: var(--cc);
+  border-color: var(--cc);
+}
+.chip.on {
+  color: #05060a;
+  background: var(--cc);
+  border-color: var(--cc);
+  font-weight: 700;
+  box-shadow: 0 0 22px color-mix(in srgb, var(--cc) 55%, transparent);
+}
+.chip.on::before,
+.chip.on::after {
+  background: repeating-linear-gradient(180deg, var(--cc) 0 3px, transparent 3px 7px);
+}
+.chip.link {
+  border-color: var(--cc);
+  color: var(--cc);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--cc) 26%, transparent) inset;
+}
+.chip.dim {
+  opacity: 0.34;
+}
+.chip .era {
+  position: absolute;
+  top: 3px;
+  right: 4px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--cc);
+  opacity: 0.85;
+}
+.chip.on .era {
+  background: #05060a;
+}
+
+/* ---------- readout ---------- */
+.read {
+  position: relative;
+  border: 1px solid var(--line);
+  background: linear-gradient(160deg, var(--panel), var(--panel2));
+  padding: 20px;
+  min-height: 280px;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 16px) 0,
+    100% 16px,
+    100% 100%,
+    16px 100%,
+    0 calc(100% - 16px)
+  );
+}
+.read::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--ac);
+  box-shadow: 0 0 16px var(--ac);
+  transition: background 0.25s, box-shadow 0.25s;
+}
+.read-in {
+  animation: roIn 0.32s ease both;
+}
+.read .rslot {
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  color: var(--mute);
+}
+.read h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(24px, 5vw, 34px);
+  color: var(--ink);
+  margin: 5px 0 4px;
+  line-height: 1;
+}
+.read .grp {
+  color: var(--ac);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  margin-bottom: 14px;
+}
+.read p {
+  color: var(--text);
+  font-size: 12.5px;
+  line-height: 1.65;
+  margin: 0 0 16px;
+}
+.read .kv {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 0;
+  border-top: 1px solid var(--line);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+}
+.read .kv span {
+  color: var(--mute);
+}
+.read .kv b {
+  color: var(--ac);
+  font-weight: 500;
+  text-align: right;
+}
+.read .lk {
+  margin-top: 14px;
+}
+.read .lk .cap {
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  color: var(--mute);
+  margin-bottom: 8px;
+}
+.read .lk .row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.read .lk .lktag {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  border: 1px solid var(--line);
+  background: transparent;
+  padding: 5px 8px;
+  color: #9dabbf;
+  cursor: pointer;
+  transition: border-color 0.16s, color 0.16s;
+}
+.read .lk .lktag:hover {
+  border-color: var(--ac);
+  color: var(--ac);
+}
+.idle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 250px;
+  gap: 9px;
+  color: #39445a;
+  text-align: center;
+}
+.idle .b {
+  font-size: 15px;
+  letter-spacing: 0.28em;
+  color: #46536b;
+}
+.idle .s {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+}
+
+/* ---------- legend + credentials ---------- */
+.legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: var(--mute);
+}
+.legend i {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+.creds {
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  color: var(--mute);
+  font-size: 11px;
+  line-height: 1.7;
+}
+.creds span {
+  color: var(--yellow);
+  letter-spacing: 0.12em;
+}
+
+/* two columns once there's room (§5 stacks under 860px) */
+@media (min-width: 861px) {
+  .st-layout {
+    grid-template-columns: 1fr minmax(260px, 330px);
+  }
+}
+
+/* tighter chip grid on the smallest screens (§5: min chip ~84px) */
+@media (max-width: 420px) {
+  .chipgrid {
+    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  }
+}
+
+/* reduced motion: keep the routed traces, drop the flowing pulse (§4) */
+@media (prefers-reduced-motion: reduce) {
+  .tr-flow {
+    animation: none;
+    opacity: 0.4;
+  }
+}
+
+/* =========================================================================
    BOOT overlay
    ========================================================================= */
 .boot {
