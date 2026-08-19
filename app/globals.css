@@ -647,11 +647,10 @@ h1, h2, h3, h4, p {
   gap: 22px;
   align-items: start;
 }
-.deckcol {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-  min-width: 0;
+.deck,
+.readout,
+.shelf {
+  min-width: 0; /* grid items default to min-width:auto and can overflow */
 }
 
 .deck {
@@ -2207,7 +2206,13 @@ h1, h2, h3, h4, p {
   /* BUILDS: deck+shelf column beside the readout; shelf wraps instead of scrolls */
   .deckwrap {
     grid-template-columns: minmax(280px, 340px) 1fr;
+    grid-template-areas:
+      'deck readout'
+      'shelf readout';
   }
+  .deck { grid-area: deck; }
+  .readout { grid-area: readout; }
+  .shelf { grid-area: shelf; align-self: start; }
   .shelfrow {
     flex-wrap: wrap;
     overflow-x: visible;

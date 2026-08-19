@@ -8,8 +8,12 @@ import { useReducedMotion } from '@/hooks/useReducedMotion';
 /* Geometry. Horizontal = desktop scope, vertical = mobile spine. Both use
    preserveAspectRatio="none" so the viewBox stretches to whatever box CSS
    gives it, which is how the trace fills the panel at any height. */
-const H = { w: 1000, cy: 95, h: 190, amp: 66, step: 2.0 };
-const V = { w: 66, cx: 33, h: 660, amp: 27, step: 1.4 };
+// `k` scales the wave so stacked harmonics + jitter (peak ~1.95x the base) stay
+// inside the viewBox; `cap` is a hard clamp backstop so a rare tall peak can
+// never poke through the scope edge (which was clipping the loud 2026 end and,
+// on the vertical spine, pushing the line off both sides).
+const H = { w: 1000, cy: 95, h: 190, amp: 66, k: 0.6, cap: 82, step: 2.0 };
+const V = { w: 66, cx: 33, h: 660, amp: 27, k: 0.5, cap: 28, step: 1.4 };
 
 /* Per-sample terms that don't depend on the animation phase. Computing these
    once (instead of every frame) leaves only the sin() calls in the hot loop. */
@@ -82,7 +86,7 @@ function precompute(eras: Era[], vertical: boolean): Precomputed {
     // evolving line and the era dots simply sit on the axis as timeline marks.
     // Lifted baseline (0.32) so the early years aren't a near-flat hum.
     const envelope = 0.32 + Math.pow(u, 1.25) * 0.68;
-    env[k] = envelope * amp * G.amp * 0.72;
+    env[k] = envelope * amp * G.amp * G.k;
 
     pos[k] = vertical ? u * G.h : u * (G as typeof H).w;
   }
@@ -115,6 +119,7 @@ export function SignalTrace({
 
   const pre = useMemo(() => precompute(eras, vertical), [eras, vertical]);
   const G = vertical ? V : H;
+  const cap = G.cap;
   const seg = eras.length - 1;
 
   /* Holds a "paint one static frame" closure. With reduced motion there's no
@@ -134,7 +139,9 @@ export function SignalTrace({
         if (pre.g3[k]) v += Math.sin(pre.f3[k] + phase * 2.6) * pre.g3[k];
         if (pre.g4[k]) v += Math.sin(pre.f4[k] + phase * 3.4) * pre.g4[k];
         v += Math.sin(pre.xj[k] + phase * 4.2) * pre.jit[k];
-        const off = v * pre.env[k];
+        let off = v * pre.env[k];
+        if (off > cap) off = cap;
+        else if (off < -cap) off = -cap;
         const px = vertical ? V.cx + off : pre.pos[k];
         const py = vertical ? pre.pos[k] : H.cy - off;
         d += `${k === a0 ? 'M' : 'L'}${px.toFixed(1)} ${py.toFixed(1)} `;

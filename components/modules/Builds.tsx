@@ -31,6 +31,7 @@ export default function Builds() {
   useEffect(() => () => timers.current.forEach((id) => window.clearTimeout(id)), []);
 
   const ejectBtn = useRef<HTMLButtonElement>(null);
+  const readoutRef = useRef<HTMLDivElement>(null);
 
   const insert = useCallback((tape: Tape) => {
     setLoaded(tape);
@@ -59,9 +60,18 @@ export default function Builds() {
 
   // Pick from the shelf. Guards double-taps mid-transition; auto-ejects first
   // if a different tape is already loaded.
+  const revealReadout = () => {
+    if (window.matchMedia('(max-width: 767px)').matches) {
+      requestAnimationFrame(() =>
+        readoutRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      );
+    }
+  };
+
   const pick = useCallback(
     (tape: Tape) => {
       if (phaseRef.current === 'loading' || phaseRef.current === 'ejecting') return;
+      revealReadout();
       if (loadedRef.current) {
         eject();
         addTimer(window.setTimeout(() => insert(tape), EJECT_MS + 20));
@@ -84,7 +94,6 @@ export default function Builds() {
       <div className="sec-sub">INSERT A CASSETTE TO READ THE FILE</div>
 
       <div className="deckwrap" style={{ ['--ac']: ac } as CSSProperties}>
-        <div className="deckcol">
           <div className="deck">
             <div className="dhead">
               <span>TAPE DECK · TD-77</span>
@@ -128,23 +137,7 @@ export default function Builds() {
             </div>
           </div>
 
-          <div className="shelf">
-            <div className="cap">{loaded ? 'OTHER TAPES' : 'SELECT A TAPE'}</div>
-            <div className="shelfrow">
-              {shelf.map((t) => (
-                <Cassette
-                  key={t.id}
-                  tape={t}
-                  mode="button"
-                  disabled={busy}
-                  onClick={() => pick(t)}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="readout">
+        <div className="readout" ref={readoutRef}>
           {!loaded || phase === 'loading' ? (
             <div className="ro-idle">
               <div className="big disp">
@@ -178,6 +171,21 @@ export default function Builds() {
               </a>
             </div>
           )}
+        </div>
+
+        <div className="shelf">
+          <div className="cap">{loaded ? 'OTHER TAPES' : 'SELECT A TAPE'}</div>
+          <div className="shelfrow">
+            {shelf.map((t) => (
+              <Cassette
+                key={t.id}
+                tape={t}
+                mode="button"
+                disabled={busy}
+                onClick={() => pick(t)}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
