@@ -49,7 +49,7 @@ export const PROFILE: Profile = {
     { k: 'ROLE', v: 'DATA ANALYST @ CRITEO' },
     { k: 'UNIT', v: 'GCOC · AMS' },
     { k: 'BASE', v: 'GURUGRAM, IN' },
-    { k: 'STATUS', v: 'SHIPPING' },
+    { k: 'STATUS', v: 'SHIPPING INNOVATIONS' },
   ],
   ctas: [
     { label: '▸ LOAD A TAPE', to: 1, primary: true },
