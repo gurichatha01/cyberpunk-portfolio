@@ -76,11 +76,13 @@ function precompute(eras: Era[], vertical: boolean): Precomputed {
     g3[k] = harm > 2 ? 0.24 * Math.min(1, harm - 2) : 0;
     g4[k] = harm > 3 ? 0.13 * Math.min(1, harm - 3) : 0;
 
-    // pinch the wave to a zero crossing exactly on every node, so the markers
-    // always sit on the axis instead of somewhere mid-swing
-    const nodeWindow = Math.pow(Math.abs(Math.sin(Math.PI * u * seg)), 0.55);
-    const envelope = 0.12 + Math.pow(u, 1.4) * 0.88;
-    env[k] = envelope * amp * nodeWindow * G.amp * 0.62;
+    // Envelope only — no node-pinch. The old version forced a zero crossing at
+    // every node, which made the trace read as separate wave packets with dead
+    // flat gaps in between; without it the signal flows as one continuous
+    // evolving line and the era dots simply sit on the axis as timeline marks.
+    // Lifted baseline (0.32) so the early years aren't a near-flat hum.
+    const envelope = 0.32 + Math.pow(u, 1.25) * 0.68;
+    env[k] = envelope * amp * G.amp * 0.72;
 
     pos[k] = vertical ? u * G.h : u * (G as typeof H).w;
   }

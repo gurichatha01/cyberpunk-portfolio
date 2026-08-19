@@ -168,8 +168,13 @@ export default function Stack() {
           ))}
         </div>
 
-        {/* ---------------- READOUT ---------------- */}
-        <div className="read" style={{ ['--ac']: ac } as CSSProperties}>
+        {/* ---------------- READOUT ----------------
+            Wrapped so the grid row height is driven by the BOARD alone. Without
+            this, selecting a chip with a long note grew the readout, grew the
+            row, and pushed the legend + credentials down the page. The readout
+            now fills the board's height and scrolls inside if it needs to. */}
+        <div className="read-col">
+          <div className="read" style={{ ['--ac']: ac } as CSSProperties}>
           {!active ? (
             <div className="idle">
               <div className="b disp">{STACK_IDLE.big}</div>
@@ -210,8 +215,9 @@ export default function Stack() {
                   </div>
                 </div>
               )}
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

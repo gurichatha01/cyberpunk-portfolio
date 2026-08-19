@@ -1804,7 +1804,35 @@ h1, h2, h3, h4, p {
     display: grid;
     grid-template-columns: 1fr minmax(260px, 330px);
     gap: 20px;
-    align-items: start;
+    /* stretch (not start) so the readout column takes the row height the board
+       sets, rather than the row growing to fit the readout */
+    align-items: stretch;
+  }
+  /* The column is an empty positioning context, so it contributes NO height of
+     its own — the row is sized by the board. The readout fills it absolutely
+     and scrolls internally, so selecting a chip can never shift the legend or
+     credentials below. */
+  .read-col {
+    position: relative;
+    min-height: 280px;
+  }
+  .st-layout .read {
+    position: absolute;
+    inset: 0;
+    min-height: 0;
+    overflow-y: auto;
+    /* thin, themed scrollbar — the default chrome one reads as a bug here */
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+  }
+  .st-layout .read::-webkit-scrollbar {
+    width: 6px;
+  }
+  .st-layout .read::-webkit-scrollbar-thumb {
+    background: var(--line);
+  }
+  .st-layout .read::-webkit-scrollbar-track {
+    background: transparent;
   }
 }
 
@@ -1871,6 +1899,10 @@ h1, h2, h3, h4, p {
   grid-template-columns: 26px 1fr auto;
   align-items: center;
   gap: 14px;
+  /* never shrink: as a flex child of .chan these were being compressed until
+     the label/value overflowed the bottom border. If they don't fit, .chan
+     scrolls instead. */
+  flex: none;
   border: 1px solid var(--line);
   background: linear-gradient(120deg, #0a0e15, #0b0e15);
   padding: 15px 18px;
@@ -1936,7 +1968,11 @@ h1, h2, h3, h4, p {
   stroke-linejoin: round;
 }
 .ch .mid {
-  min-width: 0;
+  min-width: 0; /* let long values wrap/ellipsis instead of widening the grid */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
 }
 .ch .mid .k {
   display: block;
@@ -1945,14 +1981,15 @@ h1, h2, h3, h4, p {
   font-size: 16px;
   letter-spacing: 0.04em;
   color: var(--ink);
-  line-height: 1;
+  /* matched line-heights top and bottom so the pair sits optically centred */
+  line-height: 1.2;
 }
 .ch .mid .v {
   display: block;
   font-size: 11px;
   letter-spacing: 0.06em;
   color: var(--mute);
-  margin-top: 4px;
+  line-height: 1.2;
   word-break: break-all;
 }
 .ch:hover .mid .v,
@@ -2011,9 +2048,12 @@ h1, h2, h3, h4, p {
 /* narrow: keep each channel a compact single row — drop the decorative status
    line and signal bars so the whole module fits the console with no scroll */
 @media (max-width: 520px) {
+  .chan {
+    gap: 6px;
+  }
   .ch {
     gap: 12px;
-    padding: 12px 15px;
+    padding: 9px 14px;
   }
   .ch .status,
   .ch .bars {
