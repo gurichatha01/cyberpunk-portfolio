@@ -49,12 +49,11 @@ export const CHANNELS: Channel[] = [
   {
     id: 'github',
     label: 'GITHUB',
-    value: 'TODO — add handle',
-    href: '#',
-    status: 'AWAITING LINK',
+    value: 'github.com/gurichatha01',
+    href: 'https://github.com/gurichatha01',
+    status: 'CHANNEL OPEN',
     accent: 'var(--mute)',
     icon: 'git',
-    todo: true,
   },
   {
     id: 'auxd',

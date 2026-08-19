@@ -139,7 +139,7 @@ export const ERAS: Era[] = [
   {
     yr: '2026',
     when: '2026 — PRESENT',
-    org: 'SHIPPING',
+    org: 'FREELANCE',
     role: 'INDIE PRODUCT BUILDER',
     dur: 'ONGOING',
     nc: 'var(--magenta)',
@@ -154,7 +154,7 @@ export const ERAS: Era[] = [
         t: ' end to end — idea, UX, database, auth, catalogue, payments, deploy. The hard part was never the code; it was deciding what belongs in v1. Same instinct as the 2020 scanner, six years of tooling later.',
       },
     ],
-    augs: ['Next.js', 'TypeScript', 'Supabase', 'Razorpay', 'Gemini', 'Shipping'],
+    augs: ['Next.js', 'TypeScript', 'Supabase', 'Razorpay', 'Gemini', 'FREELANCE'],
   },
 ];
 

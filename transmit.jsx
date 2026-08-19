@@ -87,7 +87,7 @@ const CHANNELS = [
     href:"mailto:add-your-email@domain.com", todo:true },
   { k:"LINKEDIN", v:"/in/gurmeherdeepchatha2001", st:"CHANNEL OPEN",   cc:"var(--cyan)",    icon:I.link,
     href:"https://www.linkedin.com/in/gurmeherdeepchatha2001/" },
-  { k:"GITHUB",   v:"add your github",            st:"CHANNEL OPEN",    cc:"var(--ink)",     icon:I.git,
+  { k:"GITHUB",   v:"https://github.com/gurichatha01",            st:"CHANNEL OPEN",    cc:"var(--ink)",     icon:I.git,
     href:"#", todo:true },
   { k:"AUXD",     v:"theauxd.vercel.app",         st:"● LIVE PRODUCT",  cc:"var(--magenta)", icon:I.disc,
     href:"https://theauxd.vercel.app" },
