@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Cassette } from '@/components/ui/Cassette';
 import { TAPES, type Tape } from '@/content/projects';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -42,6 +42,48 @@ export default function Builds() {
   useEffect(() => () => timers.current.forEach((id) => window.clearTimeout(id)), []);
 
   const ejectBtn = useRef<HTMLButtonElement>(null);
+  const deckRef = useRef<HTMLDivElement>(null);
+  const readoutRef = useRef<HTMLDivElement>(null);
+  const readoutContentRef = useRef<HTMLDivElement>(null);
+  const shelfRef = useRef<HTMLDivElement>(null);
+  const [readoutHeight, setReadoutHeight] = useState<number>();
+
+  /* Keep the two side units mechanically fixed. The centre readout measures
+     its current file and eases down only as far as that content requires. */
+  useLayoutEffect(() => {
+    if (isMobile) {
+      setReadoutHeight(undefined);
+      return;
+    }
+
+    const shell = readoutRef.current;
+    const content = readoutContentRef.current;
+    const deck = deckRef.current;
+    const shelf = shelfRef.current;
+    if (!shell || !content || !deck || !shelf) return;
+
+    const syncHeight = () => {
+      const styles = window.getComputedStyle(shell);
+      const chrome =
+        parseFloat(styles.paddingTop) +
+        parseFloat(styles.paddingBottom) +
+        parseFloat(styles.borderTopWidth) +
+        parseFloat(styles.borderBottomWidth);
+      const sideHeight = Math.max(deck.offsetHeight, shelf.offsetHeight);
+      setReadoutHeight(Math.max(sideHeight, Math.ceil(content.scrollHeight + chrome)));
+    };
+
+    syncHeight();
+    const observer = new ResizeObserver(syncHeight);
+    observer.observe(content);
+    observer.observe(deck);
+    observer.observe(shelf);
+    window.addEventListener('resize', syncHeight);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', syncHeight);
+    };
+  }, [isMobile, loaded, phase]);
 
   const insert = useCallback((tape: Tape) => {
     setLoaded(tape);
@@ -221,7 +263,7 @@ export default function Builds() {
       <div className="sec-sub">INSERT A CASSETTE TO READ THE FILE</div>
 
       <div className="deckwrap" style={{ ['--ac']: ac } as CSSProperties}>
-        <div className="deck">
+        <div className="deck" ref={deckRef}>
           <div className="dhead">
             <span>TAPE DECK · TD-77</span>
             <span className="pwr">
@@ -264,43 +306,49 @@ export default function Builds() {
           </div>
         </div>
 
-        <div className="readout">
-          {!loaded || phase === 'loading' ? (
-            <div className="ro-idle">
-              <div className="big disp">
-                {phase === 'loading' ? 'READING TAPE . . .' : 'AWAITING TAPE'}
+        <div
+          className="readout"
+          ref={readoutRef}
+          style={readoutHeight ? { height: `${readoutHeight}px` } : undefined}
+        >
+          <div className="readout-content" ref={readoutContentRef}>
+            {!loaded || phase === 'loading' ? (
+              <div className="ro-idle">
+                <div className="big disp">
+                  {phase === 'loading' ? 'READING TAPE . . .' : 'AWAITING TAPE'}
+                </div>
+                <div className="ro-idle-sub">
+                  {phase === 'loading' ? 'DECRYPTING SIDE' : 'PICK A CASSETTE FROM THE SHELF'}
+                </div>
               </div>
-              <div className="ro-idle-sub">
-                {phase === 'loading' ? 'DECRYPTING SIDE' : 'PICK A CASSETTE FROM THE SHELF'}
+            ) : (
+              <div className="ro-in" key={loaded.id}>
+                <div className="ro-mod">{loaded.mod}</div>
+                <div className="ro-h disp">{loaded.name}</div>
+                <div className="ro-tag">{loaded.tag}</div>
+                <p className="ro-p">{loaded.copy}</p>
+                <div className="ro-grid">
+                  {loaded.cells.map(([k, v]) => (
+                    <div className="ro-cell" key={k}>
+                      <span>{k}</span>
+                      <b>{v}</b>
+                    </div>
+                  ))}
+                </div>
+                <div className="ro-stack">
+                  {loaded.stack.map((s) => (
+                    <em key={s}>{s}</em>
+                  ))}
+                </div>
+                <a className="access" href={loaded.href} target="_blank" rel="noreferrer">
+                  OPEN {loaded.label} ▸
+                </a>
               </div>
-            </div>
-          ) : (
-            <div className="ro-in" key={loaded.id}>
-              <div className="ro-mod">{loaded.mod}</div>
-              <div className="ro-h disp">{loaded.name}</div>
-              <div className="ro-tag">{loaded.tag}</div>
-              <p className="ro-p">{loaded.copy}</p>
-              <div className="ro-grid">
-                {loaded.cells.map(([k, v]) => (
-                  <div className="ro-cell" key={k}>
-                    <span>{k}</span>
-                    <b>{v}</b>
-                  </div>
-                ))}
-              </div>
-              <div className="ro-stack">
-                {loaded.stack.map((s) => (
-                  <em key={s}>{s}</em>
-                ))}
-              </div>
-              <a className="access" href={loaded.href} target="_blank" rel="noreferrer">
-                OPEN {loaded.label} ▸
-              </a>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
-        <div className="shelf" aria-label="Tape rack">
+        <div className="shelf" ref={shelfRef} aria-label="Tape rack">
           <div className="cap">
             <span>TAPE RACK · 02 SLOTS</span>
             <b>{loaded ? '01 READY' : '02 READY'}</b>

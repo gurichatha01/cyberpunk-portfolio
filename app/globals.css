@@ -1378,6 +1378,11 @@ h1, h2, h3, h4, p {
   color: var(--ac);
   text-align: center;
   background: repeating-linear-gradient(-45deg, transparent 0 8px, rgba(255, 255, 255, 0.018) 8px 9px);
+  animation: rackIn 0.32s ease both;
+}
+@keyframes rackIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: none; }
 }
 .rack-empty span {
   font-size: 9px;
@@ -1397,6 +1402,8 @@ h1, h2, h3, h4, p {
   background: linear-gradient(160deg, var(--panel), var(--panel2));
   padding: 24px;
   min-height: 300px; /* reserved so idle<->seated doesn't shift (§6) */
+  overflow: hidden;
+  transition: height 0.52s cubic-bezier(0.22, 1, 0.36, 1);
   clip-path: polygon(
     0 0,
     calc(100% - 16px) 0,
@@ -2917,11 +2924,11 @@ h1, h2, h3, h4, p {
     grid-template-columns: minmax(262px, 340px) minmax(280px, 1fr) minmax(190px, 224px);
     grid-template-areas: 'deck readout shelf';
     gap: clamp(10px, 1.4vw, 22px);
-    align-items: stretch;
+    align-items: start;
   }
-  .deck { grid-area: deck; }
-  .readout { grid-area: readout; }
-  .shelf { grid-area: shelf; }
+  .deck { grid-area: deck; width: 100%; }
+  .readout { grid-area: readout; width: 100%; }
+  .shelf { grid-area: shelf; width: 100%; }
   .shelfrow {
     overflow: hidden;
   }
