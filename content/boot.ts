@@ -11,7 +11,7 @@ export interface BootLine {
 export const BOOT_TITLE = 'GURI//OS';
 
 export const BOOT_LINES: BootLine[] = [
-  { text: 'BOOT ROM v1.3 — CHATHA SYSTEMS', delay: 0.5 },
+  { text: 'BOOT ROM v1.3 // CHATHA SYSTEMS', delay: 0.5 },
   { text: 'DETECTING OPERATOR . . . . . . OK', delay: 0.9 },
   { text: 'LOADING PERSONNEL FILE [2409-GC]', delay: 1.3 },
   { text: '> DECRYPTING_', delay: 1.7 },

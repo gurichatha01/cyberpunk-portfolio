@@ -42,7 +42,7 @@ export const PROFILE: Profile = {
       b: true,
     },
     {
-      t: " Data Analyst at Criteo's Global Client Operations Center for AMS — SQL, Python and BigQuery at scale. Shipping my own consumer products on the side. I take invisible things — your listening, your chats — and turn them into something you can read.",
+      t: " Data Analyst at Criteo's Global Client Operations Center for AMS, working with SQL, Python and BigQuery at scale. Shipping my own consumer products on the side. I take invisible things like your listening and your chats, then turn them into something you can read.",
     },
   ],
   chips: [

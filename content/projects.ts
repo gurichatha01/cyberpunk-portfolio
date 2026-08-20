@@ -28,7 +28,7 @@ export const TAPES: Tape[] = [
     ac: 'var(--magenta)',
     mod: 'MOD-01 · ALBUM DECK',
     tag: 'LETTERBOXD, BUT FOR MUSIC',
-    copy: "An album-first social platform. Rate out of 5 ★ — with a 6th star for the ones that really matter — write short reviews called Takes, and build a profile around your taste. Discovery runs through people, not an algorithm. It doesn't replace Spotify or Apple Music: you listen wherever you already listen. Aux'd is where your listening lives.",
+    copy: "An album-first social platform. Rate out of 5 ★, with a 6th star for the ones that really matter. Write short reviews called Takes and build a profile around your taste. Discovery runs through people, not an algorithm. It doesn't replace Spotify or Apple Music: you listen wherever you already listen. Aux'd is where your listening lives.",
     cells: [
       ['STATUS', 'LIVE'],
       ['TYPE', 'SOCIAL / MUSIC'],
@@ -45,7 +45,7 @@ export const TAPES: Tape[] = [
     ac: 'var(--green)',
     mod: 'MOD-02 · SIGNAL ANALYZER',
     tag: 'WHATSAPP CHAT → PDF REPORT',
-    copy: 'Upload a chat export, get a designed PDF report back. Six modes — Sweetheart, Ride or Die, Group Wrapped, Family, Work, Roast. Parsing runs on your own device, so the chat itself never leaves your phone.',
+    copy: 'Upload a chat export, get a designed PDF report back. Choose from six modes: Sweetheart, Ride or Die, Group Wrapped, Family, Work or Roast. Parsing runs on your own device, so the chat itself never leaves your phone.',
     cells: [
       ['STATUS', 'LIVE · PAID'],
       ['TYPE', 'AI / ANALYSIS'],

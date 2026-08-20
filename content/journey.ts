@@ -60,7 +60,7 @@ export const JOURNEY_FOOTNOTE = {
 export const ERAS: Era[] = [
   {
     yr: '2019',
-    when: '2019 — 2023',
+    when: '2019 TO 2023',
     org: 'THAPAR',
     role: 'B.TECH · ELECTRONIC & COMPUTER ENGINEERING',
     dur: '4 YRS',
@@ -73,14 +73,14 @@ export const ERAS: Era[] = [
       { t: ', not software. Built a ' },
       { t: '3D-printed photogrammetry scanner', b: true },
       {
-        t: ' — SolidWorks for the rig, a Flutter Android app that turned a set of photos into a 3D model. Ran hospitality for the Thapar Adventure Club for three years, which is where the organising-people part came from.',
+        t: '. I used SolidWorks for the rig and built a Flutter Android app that turned a set of photos into a 3D model. Ran hospitality for the Thapar Adventure Club for three years, which is where the organising-people part came from.',
       },
     ],
     augs: ['Python', 'C', 'SolidWorks', 'Flutter', 'Signals & Systems', 'Team Lead'],
   },
   {
     yr: '2023',
-    when: 'JAN 2023 — AUG 2023',
+    when: 'JAN 2023 TO AUG 2023',
     org: 'MYLO',
     role: 'PRODUCT ANALYST · INTERN',
     dur: '8 MOS',
@@ -88,7 +88,7 @@ export const ERAS: Era[] = [
     hex: '#22f5a8',
     sig: { freq: 0.052, harm: 2, amp: 0.38, jit: 0.035 },
     body: [
-      { t: "First contact with real product data, at India's #1 parenting platform — " },
+      { t: "First contact with real product data at India's #1 parenting platform with " },
       { t: '10M+ users', b: true },
       {
         t: '. Learned that the interesting question is rarely the one you were handed, and that a number with no decision attached is just trivia.',
@@ -98,7 +98,7 @@ export const ERAS: Era[] = [
   },
   {
     yr: '2023',
-    when: 'SEP 2023 — OCT 2024',
+    when: 'SEP 2023 TO OCT 2024',
     org: 'MYLO',
     role: 'DATA ANALYST · FULL-TIME',
     dur: '1 YR 2 MOS',
@@ -118,7 +118,7 @@ export const ERAS: Era[] = [
   },
   {
     yr: '2024',
-    when: 'OCT 2024 — PRESENT',
+    when: 'OCT 2024 TO PRESENT',
     org: 'CRITEO',
     role: 'DATA ANALYST · GCOC (APAC → AMS)',
     since: '2024-10',
@@ -131,14 +131,14 @@ export const ERAS: Era[] = [
       { t: ', now in the Global Client Operations Center for ' },
       { t: 'AMS', b: true },
       {
-        t: ". Adtech data at scale — performance metrics, query review, executive summaries — plus onboarding and training new analysts. Learned to make numbers legible to people who don't want numbers.",
+        t: ". Adtech data at scale means performance metrics, query review and executive summaries, plus onboarding and training new analysts. Learned to make numbers legible to people who don't want numbers.",
       },
     ],
     augs: ['Hive', 'Tableau', 'Power BI', 'Adtech', 'Query Review', 'Stakeholder Comms'],
   },
   {
     yr: '2026',
-    when: '2026 — PRESENT',
+    when: '2026 TO PRESENT',
     org: 'FREELANCE',
     role: 'INDIE PRODUCT BUILDER',
     dur: 'ONGOING',
@@ -151,7 +151,7 @@ export const ERAS: Era[] = [
       { t: ' and ' },
       { t: 'Lores', b: true },
       {
-        t: ' end to end — idea, UX, database, auth, catalogue, payments, deploy. The hard part was never the code; it was deciding what belongs in v1. Same instinct as the 2020 scanner, six years of tooling later.',
+        t: ' end to end, covering idea, UX, database, auth, catalogue, payments and deployment. The hard part was never the code; it was deciding what belongs in v1. Same instinct as the 2020 scanner, six years of tooling later.',
       },
     ],
     augs: ['Next.js', 'TypeScript', 'Supabase', 'Razorpay', 'Gemini', 'FREELANCE'],

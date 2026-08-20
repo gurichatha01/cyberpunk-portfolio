@@ -565,7 +565,7 @@ export default function SignalRun({ onExit }: SignalRunProps) {
           <p>{SIGNOFF.whoami}</p>
           <p><b>{SIGNOFF.prompt}:~$</b> status</p>
           <p>{SIGNOFF.status}</p>
-          <strong>// END OF SIGNAL — BEGIN SOMETHING</strong>
+          <strong>// END OF SIGNAL // BEGIN SOMETHING</strong>
         </div>
 
         <footer className={styles.runFooter}>

@@ -208,7 +208,7 @@ export function SignalTrace({
       viewBox={vertical ? `0 0 ${ACROSS} ${ALONG}` : `0 0 ${ALONG} ${ACROSS}`}
       preserveAspectRatio="none"
       role="img"
-      aria-label="Career signal trace — the waveform gains frequency and amplitude from 2019 to now"
+      aria-label="Career signal trace. The waveform gains frequency and amplitude from 2019 to now"
     >
       {/* node grid lines */}
       {eras.map((_, i) =>

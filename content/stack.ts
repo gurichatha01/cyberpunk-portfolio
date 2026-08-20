@@ -168,7 +168,7 @@ export const BANKS: Bank[] = [
         name: 'Flutter',
         era: 'thapar',
         links: ['solidworks'],
-        note: 'Built the mobile side of my engineering projects — my earliest bridge from hardware to a usable interface.',
+        note: 'Built the mobile side of my engineering projects. It was my earliest bridge from hardware to a usable interface.',
       },
       {
         id: 'solidworks',
@@ -210,7 +210,7 @@ export const STACK_IDLE = {
 export const CREDENTIALS = [
   {
     k: 'EDU',
-    v: 'Thapar Institute — B.Tech, Electronic & Computer Engineering (2019–2023)',
+    v: 'Thapar Institute: B.Tech, Electronic & Computer Engineering (2019 to 2023)',
   },
-  { k: 'CERT', v: 'Google — Foundations: Data, Data, Everywhere' },
+  { k: 'CERT', v: 'Google: Foundations: Data, Data, Everywhere' },
 ];

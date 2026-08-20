@@ -284,7 +284,7 @@ export default function Builds() {
             {loaded ? (
               <Cassette tape={loaded} mode="slot" slotState={slotState} />
             ) : (
-              <span className="slotempty">— NO TAPE —</span>
+              <span className="slotempty">// NO TAPE //</span>
             )}
           </div>
 

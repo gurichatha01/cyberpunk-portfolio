@@ -12,9 +12,9 @@ import { TAPES } from '@/content/projects';
 import { CHANNELS, LOCATION } from '@/content/links';
 
 export const metadata: Metadata = {
-  title: 'Résumé — Gurmeherdeep Singh Chatha',
+  title: 'Résumé | Gurmeherdeep Singh Chatha',
   description:
-    'Résumé for Gurmeherdeep Singh (Guri) Chatha — Data Analyst at Criteo (AMS/APAC) and indie product builder.',
+    'Résumé for Gurmeherdeep Singh (Guri) Chatha, Data Analyst at Criteo (AMS/APAC) and indie product builder.',
 };
 
 /* Plain, semantic, lightly-styled résumé (§7): the recruiter escape hatch and
@@ -86,7 +86,7 @@ export default function Resume() {
         {TAPES.map((t) => (
           <article key={t.id}>
             <h3>
-              {t.name} — {t.tag.toLowerCase()}
+              {t.name} · {t.tag.toLowerCase()}
             </h3>
             <p>{t.copy}</p>
             <p className="tags">Built with: {t.stack.join(', ')}</p>

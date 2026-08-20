@@ -202,7 +202,7 @@ export default function Stack() {
               </div>
               <div className="kv">
                 <span>LINKS</span>
-                <b>{active.links.length || '—'}</b>
+                <b>{active.links.length || '0'}</b>
               </div>
               {active.links.length > 0 && (
                 <div className="lk">

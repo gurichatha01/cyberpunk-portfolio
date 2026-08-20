@@ -181,7 +181,7 @@ export default function Frame({ active, onSelect, onExit, fill, children }: Fram
         {/* hint bar — keyboard legend only (résumé lives in the topbar).
             Hidden on mobile, where it would otherwise be an empty strip. */}
         <div className="hint">
-          <span className="keys">[ 1–5 ] SWITCH MODULE · [ ← → ] SCRUB JOURNEY</span>
+          <span className="keys">[ 1-5 ] SWITCH MODULE · [ ← → ] SCRUB JOURNEY</span>
         </div>
       </div>
 
