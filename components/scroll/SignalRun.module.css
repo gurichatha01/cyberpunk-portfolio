@@ -13,7 +13,7 @@
 
 .run button,
 .run a {
-  font: inherit;
+  font-family: inherit;
 }
 
 .signalField,
@@ -123,7 +123,13 @@
 
 .modeSwitch {
   justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   padding: 10px 0;
+  line-height: 1;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: color 0.2s ease;
 }
 
@@ -136,6 +142,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
+  white-space: nowrap;
 }
 
 .mobileOnline,
@@ -144,6 +152,7 @@
 }
 
 .runResume {
+  flex-shrink: 0;
   padding: 7px 10px;
   clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 7px 100%, 0 calc(100% - 7px));
   color: var(--void);
@@ -1781,11 +1790,11 @@
   }
 
   .modeSwitch {
-    padding: 5px 6px;
+    padding: 6px 9px;
     border: 1px solid rgba(0, 229, 255, 0.25);
     color: var(--cyan);
     background: rgba(0, 229, 255, 0.035);
-    font-size: 7px;
+    font-size: 9px;
     letter-spacing: 0.1em;
   }
 
@@ -1798,8 +1807,8 @@
   }
 
   .runResume {
-    padding: 6px 8px;
-    font-size: 8px;
+    padding: 7px 10px;
+    font-size: 9px;
   }
 
   .sceneNav {
@@ -1940,8 +1949,8 @@
   }
 
   .runResume {
-    padding: 6px 8px;
-    font-size: 7px;
+    padding: 6px 9px;
+    font-size: 9px;
   }
 
   .modeSwitch {
@@ -2395,10 +2404,18 @@
   }
 }
 
-@media (max-width: 350px) {
+@media (max-width: 380px) {
   .mobileOnline {
-    display: none;
+    gap: 0;
+    font-size: 0;
   }
+
+  .hudActions {
+    gap: 5px;
+  }
+}
+
+@media (max-width: 350px) {
 
   .runFooter {
     grid-template-columns: 1fr;
