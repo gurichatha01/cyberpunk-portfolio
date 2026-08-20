@@ -1447,6 +1447,26 @@ h1, h2, h3, h4, p {
   height: clamp(130px, 19vh, 240px);
 }
 
+/* Desktop JOURNEY normally fills the stage, but on short/wide viewports its
+   contents can be taller than the available stage. Keep the scope and the
+   other fixed sections at their real height so flexbox never collapses the
+   scope around a still-full-height SVG (which shifted the visible centreline
+   down and clipped the loud end of the wave). The stage already owns vertical
+   overflow, so exceptionally short screens scroll there instead. */
+@media (min-width: 768px) {
+  .panel.fill > .jr {
+    flex: 0 0 auto;
+    min-height: 100%;
+  }
+
+  .jr > .scope,
+  .jr > .jrow,
+  .jr > .era,
+  .jr > .footnote {
+    flex-shrink: 0;
+  }
+}
+
 /* =========================================================================
    MOBILE — vertical spine + scroll-snap cards
    ========================================================================= */
@@ -2147,16 +2167,16 @@ h1, h2, h3, h4, p {
 }
 
 .chan {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 14px;
-  /* fill the space between header and sign-off; distribute the channels and
-     scroll internally only if a very short viewport can't hold them */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: repeat(6, minmax(0, 1fr));
+  gap: clamp(6px, 1vh, 10px);
+  margin-bottom: clamp(8px, 1.5vh, 14px);
+  /* Six equal tracks consume exactly the space between the header and sign-off.
+     There is deliberately no nested scroller in TRANSMIT. */
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
-  justify-content: space-between;
+  overflow: hidden;
 }
 .ch {
   position: relative;
@@ -2164,13 +2184,11 @@ h1, h2, h3, h4, p {
   grid-template-columns: 26px 1fr auto;
   align-items: center;
   gap: 14px;
-  /* never shrink: as a flex child of .chan these were being compressed until
-     the label/value overflowed the bottom border. If they don't fit, .chan
-     scrolls instead. */
-  flex: none;
+  min-height: 0;
+  height: 100%;
   border: 1px solid var(--line);
   background: linear-gradient(120deg, #0a0e15, #0b0e15);
-  padding: 15px 18px;
+  padding: clamp(7px, 1vh, 15px) 18px;
   text-decoration: none;
   color: var(--ink);
   transition: border-color 0.18s, background 0.18s;
@@ -2371,6 +2389,89 @@ h1, h2, h3, h4, p {
 }
 @keyframes cur {
   50% { opacity: 0; }
+}
+
+/* Short screens keep the entire console visible by tightening its density,
+   never by introducing a scrollbar. */
+@media (max-height: 900px) {
+  .tx .sec-h {
+    font-size: clamp(28px, 6vh, 40px);
+    margin-bottom: 2px;
+  }
+  .tx .sec-sub {
+    margin-bottom: clamp(7px, 1.5vh, 14px);
+  }
+  .chan {
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .ch {
+    padding-block: 5px;
+  }
+  .signoff {
+    padding: 10px 16px;
+    font-size: 10.5px;
+    line-height: 1.55;
+  }
+  .cur {
+    height: 12px;
+  }
+}
+
+/* At console-like ultrawide aspect ratios, two banks of three channels preserve
+   readable rows even when very little vertical space is available. */
+@media (max-height: 650px) and (min-width: 768px) {
+  .chan {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    gap: 4px 8px;
+    margin-bottom: 6px;
+  }
+  .ch {
+    grid-template-columns: 20px minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 3px 10px;
+  }
+  .ch .ico {
+    width: 20px;
+    height: 20px;
+  }
+  .ch .ico svg {
+    width: 16px;
+    height: 16px;
+  }
+  .ch .mid .k {
+    font-size: 14px;
+  }
+  .ch .mid .v {
+    font-size: 9px;
+  }
+  .ch .status {
+    display: none;
+  }
+}
+
+/* The verbose terminal exchange is decorative. On very short screens retain
+   its closing line and give the useful contact channels the saved space. */
+@media (max-height: 650px) {
+  .signoff .l:not(.end) {
+    display: none;
+  }
+  .signoff {
+    padding: 6px 12px;
+    font-size: 10px;
+    line-height: 1.4;
+  }
+}
+
+@media (max-height: 520px) {
+  .ch .mid .v,
+  .ch .rt {
+    display: none;
+  }
+  .ch {
+    grid-template-columns: 18px minmax(0, 1fr);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
