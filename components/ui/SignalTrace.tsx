@@ -1,97 +1,94 @@
 'use client';
 
-import { useEffect, useMemo, useRef } from 'react';
-import type { MutableRefObject } from 'react';
+import { useEffect, useRef } from 'react';
+import type { CSSProperties, MutableRefObject } from 'react';
 import type { Era } from '@/content/journey';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 
-/* Geometry. Horizontal = desktop scope, vertical = mobile spine. Both use
-   preserveAspectRatio="none" so the viewBox stretches to whatever box CSS
-   gives it, which is how the trace fills the panel at any height. */
-// `k` scales the wave so stacked harmonics + jitter (peak ~1.95x the base) stay
-// inside the viewBox; `cap` is a hard clamp backstop so a rare tall peak can
-// never poke through the scope edge (which was clipping the loud 2026 end and,
-// on the vertical spine, pushing the line off both sides).
-const H = { w: 1000, cy: 95, h: 190, amp: 66, k: 0.6, cap: 82, step: 2.0 };
-const V = { w: 66, cx: 33, h: 660, amp: 27, k: 0.5, cap: 28, step: 1.4 };
+/* =========================================================================
+   Signal trace — simple and unbreakable (journey-v5).
 
-/* Per-sample terms that don't depend on the animation phase. Computing these
-   once (instead of every frame) leaves only the sin() calls in the hot loop. */
-interface Precomputed {
-  n: number;
-  /** x * freq, and the three harmonic multiples */
-  f1: Float32Array;
-  f2: Float32Array;
-  f3: Float32Array;
-  f4: Float32Array;
-  /** jitter carrier + gain */
-  xj: Float32Array;
-  jit: Float32Array;
-  /** harmonic gains, already zeroed where the harmonic isn't present */
-  g2: Float32Array;
-  g3: Float32Array;
-  g4: Float32Array;
-  /** envelope * amp * node-window * maxAmp — the whole amplitude term */
-  env: Float32Array;
-  /** screen position along the sweep axis */
-  pos: Float32Array;
+   FIXED viewBox: horizontal 0 0 1000 200, vertical 0 0 200 1000. Amplitude is a
+   fraction of the viewBox, so the wave scales with whatever height CSS gives the
+   box (preserveAspectRatio="none"). Nothing is measured — no ResizeObserver — so
+   it can't render blank when it mounts on an inactive tab.
+
+   The paths get a real `d` on first render (phase 0); rAF only overrides it. The
+   wave never depends on rAF having run. vector-effect="non-scaling-stroke" is on
+   every stroked element because the box is stretched.
+   ========================================================================= */
+
+const ALONG = 1000; // sweep axis length (both orientations)
+const ACROSS = 200; // cross axis; centre = 100
+const CENTRE = ACROSS / 2;
+const HEADROOM = 0.86; // wave uses at most 86% of the half-height
+const MAX_AMP = CENTRE * HEADROOM;
+
+// harmonic weights / frequency multiples / phase multiples
+const HW = [1, 0.42, 0.24, 0.13];
+const HMUL = [1, 2.3, 4.1, 7.3];
+const HPH = [1, 1.7, 2.6, 3.4];
+
+function sigAt(t: number, eras: Era[], seg: number) {
+  const p = Math.min(seg, Math.max(0, t * seg));
+  const i = Math.floor(p);
+  const f = p - i;
+  const a = eras[i].sig;
+  const b = eras[Math.min(seg, i + 1)].sig;
+  return {
+    freq: a.freq + (b.freq - a.freq) * f,
+    harm: a.harm + (b.harm - a.harm) * f,
+    amp: a.amp + (b.amp - a.amp) * f,
+    jit: a.jit + (b.jit - a.jit) * f,
+  };
 }
 
-function precompute(eras: Era[], vertical: boolean): Precomputed {
-  const G = vertical ? V : H;
-  const seg = eras.length - 1;
-  const total = vertical ? G.h : (G as typeof H).w;
-  const n = Math.ceil(total / G.step);
+const nodeWindow = (u: number, seg: number) =>
+  Math.pow(Math.abs(Math.sin(Math.PI * u * seg)), 0.55);
 
-  const f1 = new Float32Array(n + 1);
-  const f2 = new Float32Array(n + 1);
-  const f3 = new Float32Array(n + 1);
-  const f4 = new Float32Array(n + 1);
-  const xj = new Float32Array(n + 1);
-  const jit = new Float32Array(n + 1);
-  const g2 = new Float32Array(n + 1);
-  const g3 = new Float32Array(n + 1);
-  const g4 = new Float32Array(n + 1);
-  const env = new Float32Array(n + 1);
-  const pos = new Float32Array(n + 1);
-
-  for (let k = 0; k <= n; k++) {
-    const u = k / n;
-
-    // interpolate the signal character between the two surrounding eras
-    const p = Math.min(seg, Math.max(0, u * seg));
-    const i = Math.floor(p);
-    const t = p - i;
-    const a = eras[i].sig;
-    const b = eras[Math.min(seg, i + 1)].sig;
-    const freq = a.freq + (b.freq - a.freq) * t;
-    const harm = a.harm + (b.harm - a.harm) * t;
-    const amp = a.amp + (b.amp - a.amp) * t;
-    const jitter = a.jit + (b.jit - a.jit) * t;
-
-    const x = u * 1000;
-    f1[k] = x * freq;
-    f2[k] = x * freq * 2.3;
-    f3[k] = x * freq * 4.1;
-    f4[k] = x * freq * 7.3;
-    xj[k] = x * 1.35;
-    jit[k] = jitter;
-    g2[k] = harm > 1 ? 0.42 * Math.min(1, harm - 1) : 0;
-    g3[k] = harm > 2 ? 0.24 * Math.min(1, harm - 2) : 0;
-    g4[k] = harm > 3 ? 0.13 * Math.min(1, harm - 3) : 0;
-
-    // Envelope only — no node-pinch. The old version forced a zero crossing at
-    // every node, which made the trace read as separate wave packets with dead
-    // flat gaps in between; without it the signal flows as one continuous
-    // evolving line and the era dots simply sit on the axis as timeline marks.
-    // Lifted baseline (0.32) so the early years aren't a near-flat hum.
-    const envelope = 0.32 + Math.pow(u, 1.25) * 0.68;
-    env[k] = envelope * amp * G.amp * G.k;
-
-    pos[k] = vertical ? u * G.h : u * (G as typeof H).w;
+/* Harmonics are normalised, then clamped, so the result is guaranteed within
+   ±MAX_AMP — the wave can never poke through the scope edge. */
+function sample(u: number, phase: number, eras: Era[], seg: number) {
+  const s = sigAt(u, eras, seg);
+  const x = u * 1000;
+  let v = 0;
+  let norm = 0;
+  for (let h = 0; h < 4; h++) {
+    const present = Math.min(1, Math.max(0, s.harm - h));
+    if (present <= 0) continue;
+    const w = HW[h] * present;
+    v += Math.sin(x * s.freq * HMUL[h] + phase * HPH[h]) * w;
+    norm += w;
   }
+  v += Math.sin(x * 1.35 + phase * 4.2) * s.jit;
+  norm += s.jit;
+  v = norm > 0 ? v / norm : 0;
+  v = Math.max(-1, Math.min(1, v));
+  const env = 0.12 + Math.pow(u, 1.4) * 0.88;
+  return v * env * s.amp * nodeWindow(u, seg) * MAX_AMP;
+}
 
-  return { n, f1, f2, f3, f4, xj, jit, g2, g3, g4, env, pos };
+function buildPath(
+  phase: number,
+  from: number,
+  to: number,
+  vertical: boolean,
+  eras: Era[],
+  seg: number
+) {
+  const steps = vertical ? 420 : 340;
+  const a0 = Math.max(0, Math.floor(from * steps));
+  const a1 = Math.min(steps, Math.ceil(to * steps));
+  if (a1 <= a0) return '';
+  const pts: string[] = [];
+  for (let k = a0; k <= a1; k++) {
+    const u = k / steps;
+    const off = sample(u, phase, eras, seg);
+    const px = vertical ? CENTRE + off : u * ALONG;
+    const py = vertical ? u * ALONG : CENTRE - off;
+    pts.push(`${k === a0 ? 'M' : 'L'}${px.toFixed(1)} ${py.toFixed(1)}`);
+  }
+  return pts.join(' ');
 }
 
 interface SignalTraceProps {
@@ -117,173 +114,159 @@ export function SignalTrace({
   const litRef = useRef<SVGPathElement>(null);
   const beamRef = useRef<SVGPathElement>(null);
 
-  const pre = useMemo(() => precompute(eras, vertical), [eras, vertical]);
-  const G = vertical ? V : H;
-  const cap = G.cap;
   const seg = eras.length - 1;
+  const pos = (i: number) => (i / seg) * ALONG;
 
-  /* Holds a "paint one static frame" closure. With reduced motion there's no
-     rAF loop, so the trace still needs a repaint when the selection (and hence
-     the fill) changes — otherwise the lit portion would never update. */
-  const repaint = useRef<(() => void) | null>(null);
+  // Static first-paint paths — the wave is NEVER blank, even before rAF runs.
+  const initDim = buildPath(0, 0, 1, vertical, eras, seg);
+  const initLit = buildPath(0, 0, Math.max(0.004, era / seg), vertical, eras, seg);
 
   useEffect(() => {
-    const build = (phase: number, from: number, to: number) => {
-      const a0 = Math.max(0, Math.floor(from * pre.n));
-      const a1 = Math.min(pre.n, Math.ceil(to * pre.n));
-      if (a1 <= a0) return '';
-      let d = '';
-      for (let k = a0; k <= a1; k++) {
-        let v = Math.sin(pre.f1[k] + phase);
-        if (pre.g2[k]) v += Math.sin(pre.f2[k] + phase * 1.7) * pre.g2[k];
-        if (pre.g3[k]) v += Math.sin(pre.f3[k] + phase * 2.6) * pre.g3[k];
-        if (pre.g4[k]) v += Math.sin(pre.f4[k] + phase * 3.4) * pre.g4[k];
-        v += Math.sin(pre.xj[k] + phase * 4.2) * pre.jit[k];
-        let off = v * pre.env[k];
-        if (off > cap) off = cap;
-        else if (off < -cap) off = -cap;
-        const px = vertical ? V.cx + off : pre.pos[k];
-        const py = vertical ? pre.pos[k] : H.cy - off;
-        d += `${k === a0 ? 'M' : 'L'}${px.toFixed(1)} ${py.toFixed(1)} `;
-      }
-      return d;
-    };
+    let raf = 0;
+    let stop = false;
+    const t0 = performance.now();
 
-    const paint = (phase: number, now: number, t0: number) => {
+    const frame = (now: number) => {
+      if (stop) return;
+      const phase = reduced ? 0 : ((now - t0) / 1000) * 1.05;
       const p = progress.current;
-      dimRef.current?.setAttribute('d', build(phase, 0, 1));
-      litRef.current?.setAttribute('d', build(phase, 0, Math.max(0.004, p)));
+      dimRef.current?.setAttribute('d', buildPath(phase, 0, 1, vertical, eras, seg));
+      litRef.current?.setAttribute(
+        'd',
+        buildPath(phase, 0, Math.max(0.004, p), vertical, eras, seg)
+      );
       if (beamRef.current) {
         if (reduced) {
           beamRef.current.setAttribute('d', '');
         } else {
           const bu = ((now - t0) / 3000) % 1;
-          beamRef.current.setAttribute('d', build(phase, Math.max(0, bu - 0.06), bu));
+          beamRef.current.setAttribute(
+            'd',
+            buildPath(phase, Math.max(0, bu - 0.06), bu, vertical, eras, seg)
+          );
         }
       }
-    };
-
-    // Reduced motion: paint one static frame, no loop at all.
-    if (reduced) {
-      repaint.current = () => paint(0, 0, 0);
-      repaint.current();
-      return () => {
-        repaint.current = null;
-      };
-    }
-
-    let raf = 0;
-    const t0 = performance.now();
-    let running = true;
-
-    const frame = (now: number) => {
-      if (!running) return;
-      paint(((now - t0) / 1000) * 1.05, now, t0);
-      raf = requestAnimationFrame(frame);
+      // reduced motion paints exactly one frame; otherwise loop
+      if (!reduced) raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);
 
-    // Don't burn CPU animating a trace nobody is looking at.
-    const onVisibility = () => {
+    // Pause the loop when the tab is hidden (the static `d` keeps it visible).
+    const onVis = () => {
+      if (reduced) return;
       if (document.hidden) {
-        running = false;
+        stop = true;
         cancelAnimationFrame(raf);
-      } else if (!running) {
-        running = true;
+      } else {
+        stop = false;
         raf = requestAnimationFrame(frame);
       }
     };
-    document.addEventListener('visibilitychange', onVisibility);
+    document.addEventListener('visibilitychange', onVis);
 
     return () => {
-      running = false;
+      stop = true;
       cancelAnimationFrame(raf);
-      document.removeEventListener('visibilitychange', onVisibility);
+      document.removeEventListener('visibilitychange', onVis);
     };
-  }, [pre, vertical, reduced, progress]);
-
-  // Reduced motion only: the animation loop isn't running, so redraw the fill
-  // whenever the selected era moves.
-  useEffect(() => {
-    if (reduced) repaint.current?.();
-  }, [era, reduced]);
-
-  const nodeAt = (i: number) => (i / seg) * (vertical ? V.h : H.w);
+  }, [eras, vertical, reduced, progress]);
 
   return (
     <svg
       className={className}
-      viewBox={`0 0 ${G.w} ${G.h}`}
+      viewBox={vertical ? `0 0 ${ACROSS} ${ALONG}` : `0 0 ${ALONG} ${ACROSS}`}
       preserveAspectRatio="none"
       role="img"
       aria-label="Career signal trace — the waveform gains frequency and amplitude from 2019 to now"
     >
-      {/* grid */}
-      {vertical
-        ? eras.map((_, i) => (
-            <line
-              key={i}
-              className="gridln"
-              x1="3"
-              y1={nodeAt(i)}
-              x2={V.w - 3}
-              y2={nodeAt(i)}
-            />
-          ))
-        : [
-            [25, 95, 165].map((y) => (
-              <line key={`h${y}`} className="gridln" x1="0" y1={y} x2={H.w} y2={y} />
-            )),
-            eras.map((_, i) => (
-              <line
-                key={`v${i}`}
-                className="gridln"
-                x1={nodeAt(i)}
-                y1="6"
-                x2={nodeAt(i)}
-                y2={H.h - 6}
-              />
-            )),
-          ]}
-
-      {/* playhead marks the selected era on the desktop scope */}
-      {!vertical && (
-        <line
-          className="playhead"
-          x1={nodeAt(era)}
-          y1="6"
-          x2={nodeAt(era)}
-          y2={H.h - 6}
-          vectorEffect="non-scaling-stroke"
-        />
+      {/* node grid lines */}
+      {eras.map((_, i) =>
+        vertical ? (
+          <line
+            key={i}
+            className="gridln"
+            x1="4"
+            y1={pos(i)}
+            x2={ACROSS - 4}
+            y2={pos(i)}
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : (
+          <line
+            key={i}
+            className="gridln"
+            x1={pos(i)}
+            y1="0"
+            x2={pos(i)}
+            y2={ACROSS}
+            vectorEffect="non-scaling-stroke"
+          />
+        )
       )}
 
-      {/* the signal: full dim trace, lit portion up to progress, sweeping beam */}
-      <path ref={dimRef} className="wave-dim" vectorEffect="non-scaling-stroke" />
-      <path ref={litRef} className="wave-lit" vectorEffect="non-scaling-stroke" />
-      <path ref={beamRef} className="beam" vectorEffect="non-scaling-stroke" />
+      {/* desktop: centre line + playhead marking the selected era */}
+      {!vertical && (
+        <>
+          <line
+            className="gridln"
+            x1="0"
+            y1={CENTRE}
+            x2={ALONG}
+            y2={CENTRE}
+            vectorEffect="non-scaling-stroke"
+          />
+          <line
+            className="playhead"
+            x1={pos(era)}
+            y1="0"
+            x2={pos(era)}
+            y2={ACROSS}
+            vectorEffect="non-scaling-stroke"
+          />
+        </>
+      )}
+
+      {/* the signal: full dim trace, lit portion up to progress, sweeping beam.
+          `d` is set on render so it's never blank; rAF overrides it. */}
+      <path
+        ref={dimRef}
+        className="wave-dim"
+        d={initDim}
+        strokeWidth="1.4"
+        vectorEffect="non-scaling-stroke"
+      />
+      <path
+        ref={litRef}
+        className="wave-lit"
+        d={initLit}
+        strokeWidth="1.9"
+        vectorEffect="non-scaling-stroke"
+      />
+      <path ref={beamRef} className="beam" strokeWidth="1.7" vectorEffect="non-scaling-stroke" />
 
       {/* era nodes */}
       {eras.map((e, i) => {
-        const at = nodeAt(i);
-        const cx = vertical ? V.cx : at;
-        const cy = vertical ? at : H.cy;
+        const cx = vertical ? CENTRE : pos(i);
+        const cy = vertical ? pos(i) : CENTRE;
         const dot = (
           <circle
             className="nodedot"
             cx={cx}
             cy={cy}
-            r={i === era ? 8 : vertical ? 5.5 : 6}
+            r={i === era ? 7 : 5}
             fill={i <= era ? e.hex : '#0a0e14'}
             stroke={e.hex}
+            strokeWidth="2"
             vectorEffect="non-scaling-stroke"
-            style={i === era ? { filter: `drop-shadow(0 0 9px ${e.hex})` } : undefined}
+            style={
+              i === era ? ({ filter: `drop-shadow(0 0 9px ${e.hex})` } as CSSProperties) : undefined
+            }
           />
         );
         // desktop nodes are a mouse affordance; the chips are the real control
         return onSelect && !vertical ? (
           <g key={i} onClick={() => onSelect(i)} style={{ cursor: 'pointer' }}>
-            <rect x={at - 30} y="6" width="60" height={H.h - 12} fill="transparent" />
+            <rect x={pos(i) - 30} y="0" width="60" height={ACROSS} fill="transparent" />
             {dot}
           </g>
         ) : (
