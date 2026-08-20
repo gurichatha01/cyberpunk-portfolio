@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Chakra_Petch, JetBrains_Mono } from 'next/font/google';
+import AnimatedFavicon from '@/components/AnimatedFavicon';
 import './globals.css';
 
 /* Self-hosted by next/font at build time — no runtime request to Google (§1).
@@ -38,7 +39,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${display.variable} ${mono.variable}`}>
-      <body>{children}</body>
+      <body>
+        <AnimatedFavicon />
+        {children}
+      </body>
     </html>
   );
 }
