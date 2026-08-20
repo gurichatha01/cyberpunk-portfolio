@@ -19,3 +19,34 @@ export const BOOT_LINES: BootLine[] = [
 
 /** Total time the overlay stays up before auto-dismiss (ms). */
 export const BOOT_DURATION = 2100;
+
+export interface BootMode {
+  id: 'console' | 'signal';
+  no: string;
+  title: string;
+  version: string;
+  description: string;
+  command: string;
+  accent: 'yellow' | 'cyan';
+}
+
+export const BOOT_MODES: BootMode[] = [
+  {
+    id: 'console',
+    no: '01',
+    title: 'CONSOLE OS',
+    version: 'ORIGINAL · v1.3',
+    description: 'The tabbed operator console. Direct access to every system module.',
+    command: 'ENTER CONSOLE',
+    accent: 'yellow',
+  },
+  {
+    id: 'signal',
+    no: '02',
+    title: 'SIGNAL RUN',
+    version: 'EXPERIMENTAL · v2.0',
+    description: 'A continuous descent through the person, the work, and the signal.',
+    command: 'BEGIN DESCENT',
+    accent: 'cyan',
+  },
+];
