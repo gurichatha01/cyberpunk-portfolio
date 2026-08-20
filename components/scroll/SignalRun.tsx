@@ -328,7 +328,7 @@ export default function SignalRun({ onExit }: SignalRunProps) {
           <i />
           <i />
           <i />
-          <span>0117-GS</span>
+          <span>Profile ID: 2409-GC</span>
         </div>
         <div className={styles.heroCopy}>
           <p className={styles.kicker}>{PROFILE.eyebrow}</p>

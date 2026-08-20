@@ -107,7 +107,7 @@ export default function Frame({ active, onSelect, onExit, fill, children }: Fram
       <span className="bracket tr" />
       <span className="bracket bl" />
       <span className="bracket br" />
-      <div className="serial">PERSONNEL FILE · 0117-AX · CHATHA</div>
+      <div className="serial">PERSONNEL FILE · 2409-AX · CHATHA</div>
 
       <div className="frame">
         {/* topbar — collapses to one line on mobile */}
