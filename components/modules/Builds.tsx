@@ -2,14 +2,15 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Cassette } from '@/components/ui/Cassette';
+import { RoboticArm } from '@/components/ui/RoboticArm';
 import { TAPES, type Tape } from '@/content/projects';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import type { CSSProperties } from 'react';
 
 type Phase = 'idle' | 'loading' | 'seated' | 'ejecting';
 
-const LOAD_MS = 860; // idle -> seated
-const EJECT_MS = 480; // seated -> idle
+const LOAD_MS = 2400; // rack pickup -> arm transfer -> seated
+const EJECT_MS = 2200; // deck extraction -> rack return -> idle
 const DEFAULT_AC = 'var(--cyan)';
 
 export default function Builds() {
@@ -71,9 +72,9 @@ export default function Builds() {
         parseFloat(styles.paddingBottom) +
         parseFloat(styles.borderTopWidth) +
         parseFloat(styles.borderBottomWidth);
-      const sideHeight = Math.max(deck.offsetHeight, shelf.offsetHeight);
-      setSideHeight(sideHeight);
-      setReadoutHeight(Math.max(sideHeight, Math.ceil(content.scrollHeight + chrome)));
+      const fixedSideHeight = Math.max(deck.offsetHeight, shelf.offsetHeight);
+      setSideHeight(fixedSideHeight);
+      setReadoutHeight(Math.max(fixedSideHeight, Math.ceil(content.scrollHeight + chrome)));
     };
 
     syncHeight();
@@ -91,6 +92,7 @@ export default function Builds() {
   const insert = useCallback((tape: Tape) => {
     setLoaded(tape);
     setPhase('loading');
+    setStatus(`Transferring ${tape.name} to deck`);
     addTimer(
       window.setTimeout(() => {
         setPhase('seated');
@@ -104,6 +106,7 @@ export default function Builds() {
   const eject = useCallback(() => {
     const name = loadedRef.current?.name;
     setPhase('ejecting');
+    setStatus(name ? `Returning ${name} to rack` : 'Returning tape to rack');
     addTimer(
       window.setTimeout(() => {
         setLoaded(null);
@@ -266,6 +269,15 @@ export default function Builds() {
       <div className="sec-sub">INSERT A CASSETTE TO READ THE FILE</div>
 
       <div className="deckwrap" style={{ ['--ac']: ac } as CSSProperties}>
+        {loaded && (phase === 'loading' || phase === 'ejecting') && (
+          <RoboticArm
+            key={`${loaded.id}-${phase}`}
+            tape={loaded}
+            mode={phase === 'loading' ? 'insert' : 'eject'}
+            slot={TAPES.findIndex((tape) => tape.id === loaded.id)}
+          />
+        )}
+
         <div
           className="deck"
           ref={deckRef}

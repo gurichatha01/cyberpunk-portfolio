@@ -99,7 +99,7 @@ export const BANKS: Bank[] = [
   },
   {
     id: 'ship',
-    cap: 'BANK B · SHIP KIT',
+    cap: 'BANK B · FREELANCE KIT',
     chips: [
       {
         id: 'nextjs',
@@ -161,7 +161,7 @@ export const BANKS: Bank[] = [
   },
   {
     id: 'legacy',
-    cap: 'BANK C · LEGACY / HARDWARE',
+    cap: 'BANK C · LEGACY',
     chips: [
       {
         id: 'flutter',
