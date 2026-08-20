@@ -144,19 +144,56 @@ function ProjectVisual({ id }: { id: string }) {
 
   return (
     <div className={`${styles.projectVisual} ${styles.loresVisual}`} aria-hidden="true">
-      <div className={styles.chatStack}>
-        <i />
-        <i />
-        <i />
-        <span>CHAT.LOG</span>
+      <div className={styles.analysisTopbar}>
+        <span>INPUT / WHATSAPP_EXPORT.TXT</span>
+        <b><i /> LOCAL ANALYSIS</b>
       </div>
-      <div className={styles.reportSheet}>
-        <b>LORES</b>
-        <span />
-        <span />
-        <span />
+
+      <div className={styles.chatScanner}>
+        <div className={styles.threadRail}>
+          <span>01</span><span>02</span><span>03</span><span>04</span><span>05</span><span>06</span>
+        </div>
+        <div className={styles.messageFeed}>
+          <div className={styles.messageA}>
+            <small>23:07 · A</small>
+            <p>you&apos;re not going to believe what happened</p>
+            <i><span>TONE</span><b>EXCITED</b></i>
+          </div>
+          <div className={styles.messageB}>
+            <small>B · 23:08</small>
+            <p>voice note. now.</p>
+            <i><span>REPLY</span><b>00:42</b></i>
+          </div>
+          <div className={styles.messageA}>
+            <small>23:12 · A</small>
+            <p>okay but you cannot judge me 😭</p>
+            <i><span>SIGNAL</span><b>TRUST</b></i>
+          </div>
+          <div className={styles.messageB}>
+            <small>B · 23:12</small>
+            <p>too late. sending snacks.</p>
+            <i><span>PATTERN</span><b>CARE</b></i>
+          </div>
+        </div>
+        <div className={styles.scanBeam}>
+          <span>SCANNING THREAD</span>
+        </div>
       </div>
-      <span className={styles.visualCode}>PRIVATE INPUT / DESIGNED OUTPUT</span>
+
+      <div className={styles.analysisRail}>
+        <div><small>CONVERSATION RHYTHM</small><span><i /><i /><i /><i /><i /><i /><i /><i /></span></div>
+        <div><small>RELATIONSHIP SIGNALS</small><b>TONE · TIMING · THREADS</b></div>
+        <div><small>PRIVACY GATE</small><b>ON-DEVICE ✓</b></div>
+      </div>
+
+      <div className={styles.reportAssembler}>
+        <span>REPORT ASSEMBLY</span>
+        <strong>LORES</strong>
+        <div><i /><i /><i /><i /></div>
+        <b>PDF // 06 CHAPTERS</b>
+      </div>
+
+      <span className={styles.visualCode}>RAW CHAT / SIGNAL EXTRACTION / DESIGNED REPORT</span>
     </div>
   );
 }
@@ -252,9 +289,19 @@ export default function SignalRun({ onExit }: SignalRunProps) {
           <span>{SCENES[activeScene].no}</span>
           <b>{SCENES[activeScene].label}</b>
         </div>
-        <button className={styles.modeSwitch} type="button" onClick={switchMode}>
-          EXIT TO BOOT ↗
-        </button>
+        <div className={styles.hudActions}>
+          <span className={styles.mobileOnline}>
+            <i /> ONLINE
+          </span>
+          <button className={styles.modeSwitch} type="button" onClick={switchMode}>
+            <span className={styles.switchLong}>EXIT TO BOOT</span>
+            <span className={styles.switchShort}>BOOT</span>
+            {' ↗'}
+          </button>
+          <a className={styles.runResume} href="/resume">
+            ▸ RÉSUMÉ
+          </a>
+        </div>
         <div className={styles.progressRail} aria-hidden="true">
           <i />
         </div>
@@ -364,7 +411,11 @@ export default function SignalRun({ onExit }: SignalRunProps) {
       <section id="signal-journey" className={`${styles.scene} ${styles.journey}`} data-run-section>
         <div className={styles.journeyIntro}>
           <span>02 / CAREER SIGNAL</span>
-          <h2>HARDWARE<br />→ DATA<br />→ PRODUCT</h2>
+          <h2 className={styles.journeyTitle}>
+            <span>HARDWARE</span>
+            <span><i>→</i> DATA</span>
+            <span><i>→</i> PRODUCT</span>
+          </h2>
           <p>The frequency rises as the work compounds.</p>
         </div>
 
@@ -407,7 +458,7 @@ export default function SignalRun({ onExit }: SignalRunProps) {
                   <b>{item.yr}</b>
                   <i />
                 </div>
-                <div>
+                <div className={styles.eraCopy}>
                   <div className={styles.eraMeta}>
                     <span>{item.when}</span>
                     <b>{item.since ? formatDuration(item.since) : item.dur}</b>

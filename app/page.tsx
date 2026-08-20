@@ -58,7 +58,12 @@ export default function Page() {
   }
 
   return (
-    <Frame active={active} onSelect={select} fill={active === 2 || active === 4 || (active === 3 && compact)}>
+    <Frame
+      active={active}
+      onSelect={select}
+      onExit={exitExperience}
+      fill={active === 2 || active === 4 || (active === 3 && compact)}
+    >
       {active === 0 ? (
         <Profile revealed onGo={select} />
       ) : active === 1 ? (

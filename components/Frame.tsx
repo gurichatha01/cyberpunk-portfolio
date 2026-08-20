@@ -21,13 +21,14 @@ function Clock() {
 interface FrameProps {
   active: number;
   onSelect: (i: number) => void;
+  onExit: () => void;
   /** the active module fills the stage exactly and scrolls internally
       (JOURNEY always; STACK on mobile) instead of growing the stage */
   fill?: boolean;
   children: React.ReactNode;
 }
 
-export default function Frame({ active, onSelect, fill, children }: FrameProps) {
+export default function Frame({ active, onSelect, onExit, fill, children }: FrameProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const desktopTabs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -116,7 +117,7 @@ export default function Frame({ active, onSelect, fill, children }: FrameProps) 
             <span className="opt">v1.3</span>
           </div>
           <div className="grp">
-            <span>
+            <span className="online-state">
               <span className="dot" />
               ONLINE
             </span>
@@ -124,6 +125,11 @@ export default function Frame({ active, onSelect, fill, children }: FrameProps) 
             <span className="opt">
               <Clock />
             </span>
+            <button className="console-exit" type="button" onClick={onExit}>
+              <span className="exit-long">EXIT TO BOOT</span>
+              <span className="exit-short">BOOT</span>
+              {' ↗'}
+            </button>
             <a className="resume disp" href="/resume">
               ▸ RÉSUMÉ
             </a>
