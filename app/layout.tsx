@@ -21,7 +21,7 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'GURI//OS — Gurmeherdeep Singh Chatha',
+  title: 'GURI//OS',
   description:
     'Data Analyst at Criteo and indie product builder. Electronics engineer by training, analyst by trade, builder by choice.',
 };
