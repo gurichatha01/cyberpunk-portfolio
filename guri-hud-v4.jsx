@@ -381,14 +381,14 @@ export default function App() {
           <div className="ln big" style={{ animationDelay: ".05s" }}>GURI//OS</div>
           <div className="ln" style={{ animationDelay: ".5s" }}>BOOT ROM v1.3 — CHATHA SYSTEMS</div>
           <div className="ln" style={{ animationDelay: ".9s" }}>DETECTING OPERATOR . . . . . . OK</div>
-          <div className="ln" style={{ animationDelay: "1.3s" }}>LOADING PERSONNEL FILE [0117-GS]</div>
+          <div className="ln" style={{ animationDelay: "1.3s" }}>LOADING PERSONNEL FILE [2409-GC]</div>
           <div className="ln" style={{ animationDelay: "1.7s" }}>&gt; DECRYPTING_</div>
         </div>
       )}
 
       <span className="bracket tl" /><span className="bracket tr" />
       <span className="bracket bl" /><span className="bracket br" />
-      <div className="serial">PERSONNEL FILE · 0117-AX · CHATHA</div>
+      <div className="serial">PERSONNEL FILE · 2409-AX · CHATHA</div>
 
       <div className="frame">
         <div className="topbar">
@@ -412,7 +412,7 @@ export default function App() {
             {/* 01 PROFILE */}
             {tab === 0 && (
               <div>
-                <div className="eyebrow">PERSONNEL FILE // 0117-GS</div>
+                <div className="eyebrow">PERSONNEL FILE // 2409-GS</div>
                 <div className="name disp">{nameOut}</div>
                 <div className="fullname">GURMEHERDEEP SINGH CHATHA</div>
                 <div className="role disp">DATA ANALYST<span className="x">×</span>PRODUCT BUILDER</div>

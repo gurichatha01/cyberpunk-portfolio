@@ -32,7 +32,7 @@ export interface Profile {
 }
 
 export const PROFILE: Profile = {
-  eyebrow: 'PERSONNEL FILE // 0117-GS',
+  eyebrow: 'PERSONNEL FILE // 2409-GC',
   name: 'GURI',
   fullName: 'GURMEHERDEEP SINGH CHATHA',
   role: { a: 'DATA ANALYST', b: 'PRODUCT BUILDER' },
