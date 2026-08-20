@@ -24,14 +24,14 @@ export interface Bank {
   chips: Chip[];
 }
 
-export type EraKey = 'thapar' | 'mylo' | 'criteo' | 'shipping';
+export type EraKey = 'thapar' | 'mylo' | 'criteo' | 'freelance';
 
 /* same four accents as JOURNEY */
 export const ERA: Record<EraKey, StackEra> = {
   thapar: { c: '#00e5ff', label: 'THAPAR · 2019' },
   mylo: { c: '#22f5a8', label: 'MYLO · 2023' },
   criteo: { c: '#fcee0a', label: 'CRITEO · 2024' },
-  shipping: { c: '#ff2e6e', label: 'SHIPPING · 2026' },
+  freelance: { c: '#ff2e6e', label: 'FREELANCE · 2026' },
 };
 
 export const BANKS: Bank[] = [
