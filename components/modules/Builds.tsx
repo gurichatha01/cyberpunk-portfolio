@@ -46,12 +46,14 @@ export default function Builds() {
   const readoutRef = useRef<HTMLDivElement>(null);
   const readoutContentRef = useRef<HTMLDivElement>(null);
   const shelfRef = useRef<HTMLDivElement>(null);
+  const [sideHeight, setSideHeight] = useState<number>();
   const [readoutHeight, setReadoutHeight] = useState<number>();
 
   /* Keep the two side units mechanically fixed. The centre readout measures
      its current file and eases down only as far as that content requires. */
   useLayoutEffect(() => {
     if (isMobile) {
+      setSideHeight(undefined);
       setReadoutHeight(undefined);
       return;
     }
@@ -70,6 +72,7 @@ export default function Builds() {
         parseFloat(styles.borderTopWidth) +
         parseFloat(styles.borderBottomWidth);
       const sideHeight = Math.max(deck.offsetHeight, shelf.offsetHeight);
+      setSideHeight(sideHeight);
       setReadoutHeight(Math.max(sideHeight, Math.ceil(content.scrollHeight + chrome)));
     };
 
@@ -263,7 +266,11 @@ export default function Builds() {
       <div className="sec-sub">INSERT A CASSETTE TO READ THE FILE</div>
 
       <div className="deckwrap" style={{ ['--ac']: ac } as CSSProperties}>
-        <div className="deck" ref={deckRef}>
+        <div
+          className="deck"
+          ref={deckRef}
+          style={sideHeight ? { height: `${sideHeight}px` } : undefined}
+        >
           <div className="dhead">
             <span>TAPE DECK · TD-77</span>
             <span className="pwr">
@@ -348,7 +355,12 @@ export default function Builds() {
           </div>
         </div>
 
-        <div className="shelf" ref={shelfRef} aria-label="Tape rack">
+        <div
+          className="shelf"
+          ref={shelfRef}
+          aria-label="Tape rack"
+          style={sideHeight ? { height: `${sideHeight}px` } : undefined}
+        >
           <div className="cap">
             <span>TAPE RACK · 02 SLOTS</span>
             <b>{loaded ? '01 READY' : '02 READY'}</b>

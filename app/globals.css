@@ -1403,7 +1403,8 @@ h1, h2, h3, h4, p {
   padding: 24px;
   min-height: 300px; /* reserved so idle<->seated doesn't shift (§6) */
   overflow: hidden;
-  transition: height 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: height 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: height;
   clip-path: polygon(
     0 0,
     calc(100% - 16px) 0,
