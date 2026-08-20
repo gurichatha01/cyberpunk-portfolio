@@ -216,7 +216,7 @@ export default function Builds() {
     phase === 'loading' ? 'loading' : phase === 'ejecting' ? 'ejecting' : 'seated';
 
   return (
-    <div>
+    <div className="bd">
       <div className="sec-h disp">BUILDS</div>
       <div className="sec-sub">INSERT A CASSETTE TO READ THE FILE</div>
 

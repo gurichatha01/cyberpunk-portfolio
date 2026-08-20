@@ -12,7 +12,7 @@ interface ProfileProps {
 
 export default function Profile({ revealed, onGo }: ProfileProps) {
   return (
-    <div>
+    <div className="profile">
       <div className="eyebrow">{PROFILE.eyebrow}</div>
 
       <h1 className="name disp">

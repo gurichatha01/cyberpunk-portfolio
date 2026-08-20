@@ -374,30 +374,29 @@ h1, h2, h3, h4, p {
   padding: 4px 0;
   display: flex;
   flex-direction: column;
-  /* the one scroll container in the app — a tall module scrolls here while the
-     chrome stays snapped to the screen. Horizontal is clipped, never scrolls. */
-  overflow-y: auto;
-  overflow-x: hidden;
+  /* The console is one fixed viewport. Individual modules own any intentional
+     interaction (Journey's hidden mobile card scroller); the page/stage never
+     exposes a browser scrollbar. */
+  overflow: hidden;
 }
 .panel {
   width: 100%;
   min-width: 0;
   min-height: 0;
-  /* flow modules: fill the stage at minimum; grow past it (and let the stage
-     scroll) when the module is taller than one screen */
-  flex: 1 0 auto;
+  flex: 1 1 0%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 /* fill modules (JOURNEY; STACK on mobile) cap to the stage so they manage
    their own internal scroll and the stage itself never scrolls */
 .panel.fill {
   flex: 1 1 0%;
 }
-/* JOURNEY fills exactly and manages its own inner scroll; every other module
-   keeps its natural height and sits at the top of the (filled) panel. */
-.panel > :not(.jr) {
-  flex: 0 0 auto;
+/* Every module receives the exact stage height. Layouts compact responsively
+   rather than making the surrounding page scroll. */
+.panel > * {
+  min-height: 0;
 }
 /* Module transition — the signature move. Incoming panel slides in; on a nav
    change it ALSO runs the glitch (hard clip-path chop + horizontal jitter).
@@ -508,6 +507,9 @@ h1, h2, h3, h4, p {
 /* =========================================================================
    MODULE 01 · PROFILE
    ========================================================================= */
+.profile {
+  min-height: 0;
+}
 .eyebrow {
   color: var(--cyan);
   font-size: 11px;
@@ -615,6 +617,117 @@ h1, h2, h3, h4, p {
   color: var(--cyan);
   background: transparent;
   box-shadow: none;
+}
+
+@media (max-width: 767px) {
+  .profile {
+    flex: 1 1 0%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: clamp(18px, 4vh, 38px);
+    overflow: hidden;
+  }
+
+  .profile .eyebrow {
+    font-size: 9px;
+    margin-bottom: 8px;
+  }
+  .profile .name {
+    font-size: clamp(52px, 17vw, 76px);
+  }
+  .profile .fullname {
+    margin: 8px 0 12px;
+    font-size: clamp(9px, 2.8vw, 12px);
+  }
+  .profile .role {
+    font-size: clamp(18px, 5.8vw, 26px);
+  }
+  .profile .bio {
+    margin: 12px 0 14px;
+    font-size: clamp(10px, 2.8vw, 13px);
+    line-height: 1.5;
+  }
+  .profile .chips {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .profile .chip {
+    min-width: 0;
+    padding: 6px 8px;
+    font-size: clamp(8px, 2.1vw, 10px);
+    letter-spacing: 0.06em;
+    overflow-wrap: anywhere;
+  }
+  .profile .ctas {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+  .profile .btn {
+    min-width: 0;
+    padding: 10px 6px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+}
+
+@media (max-width: 767px) and (max-height: 640px) {
+  .profile {
+    justify-content: flex-start;
+    padding-top: 0;
+  }
+  .profile .eyebrow {
+    font-size: 8px;
+    margin-bottom: 4px;
+  }
+  .profile .name {
+    font-size: clamp(48px, 16vw, 62px);
+  }
+  .profile .fullname {
+    margin: 5px 0 7px;
+    font-size: 8px;
+  }
+  .profile .role {
+    font-size: clamp(16px, 5.4vw, 21px);
+    line-height: 1.05;
+  }
+  .profile .bio {
+    margin: 7px 0 8px;
+    font-size: clamp(8px, 2.55vw, 10px);
+    line-height: 1.35;
+  }
+  .profile .chips {
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+  .profile .chip {
+    padding: 4px 5px;
+    font-size: 7px;
+  }
+  .profile .ctas {
+    gap: 5px;
+  }
+  .profile .btn {
+    padding: 7px 4px;
+    font-size: 8px;
+  }
+}
+
+@media (max-width: 860px) {
+  .bd {
+    flex: 1 1 0%;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .bd::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Shared section headers (BUILDS / JOURNEY / STACK / TRANSMIT) */
@@ -1523,23 +1636,66 @@ h1, h2, h3, h4, p {
   height: clamp(130px, 19vh, 240px);
 }
 
-/* Desktop JOURNEY normally fills the stage, but on short/wide viewports its
-   contents can be taller than the available stage. Keep the scope and the
-   other fixed sections at their real height so flexbox never collapses the
-   scope around a still-full-height SVG (which shifted the visible centreline
-   down and clipped the loud end of the wave). The stage already owns vertical
-   overflow, so exceptionally short screens scroll there instead. */
+/* Desktop JOURNEY fills the stage. The scope keeps its own height so the SVG
+   centreline never shifts or clips; the detail card absorbs the remaining
+   height instead of making the stage taller than the viewport. */
 @media (min-width: 768px) {
   .panel.fill > .jr {
-    flex: 0 0 auto;
-    min-height: 100%;
+    flex: 1 1 0%;
+    min-height: 0;
+    overflow: hidden;
   }
 
   .jr > .scope,
   .jr > .jrow,
-  .jr > .era,
   .jr > .footnote {
     flex-shrink: 0;
+  }
+
+  .jr > .era {
+    flex: 1 1 0%;
+    min-height: 0;
+    overflow: hidden;
+  }
+}
+
+/* Laptop-height desktop screens keep the full Journey, but tighten the scope
+   and card typography enough that the detail panel remains wholly visible. */
+@media (min-width: 768px) and (max-height: 950px) {
+  .hscope {
+    height: clamp(124px, 16vh, 160px);
+  }
+  .jr > .scope {
+    margin-bottom: 10px;
+    padding: 9px 12px;
+  }
+  .jr > .jrow {
+    margin-bottom: 10px;
+  }
+  .jr > .era {
+    padding: 13px 18px;
+  }
+  .era .top {
+    margin-bottom: 6px;
+  }
+  .era .org {
+    font-size: 30px;
+  }
+  .era p {
+    max-width: 900px;
+    margin-bottom: 8px;
+    font-size: 11.5px;
+    line-height: 1.42;
+  }
+  .augh {
+    margin-bottom: 5px;
+  }
+  .aug {
+    padding: 4px 7px;
+    font-size: 8.5px;
+  }
+  .footnote {
+    margin-top: 8px;
   }
 }
 
