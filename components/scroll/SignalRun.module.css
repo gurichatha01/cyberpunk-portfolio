@@ -2258,7 +2258,7 @@
 
   .eraCard h3 {
     margin-top: 14px;
-    font-size: 16vw;
+    font-size: clamp(28px, 13cqw, 44px);
   }
 
   .eraCard h4 {
