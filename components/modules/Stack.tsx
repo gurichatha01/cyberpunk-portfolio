@@ -91,13 +91,9 @@ export default function Stack() {
     window.addEventListener('resize', run);
     const board = boardRef.current;
     const ro = new ResizeObserver(run);
-    if (board) {
-      ro.observe(board);
-      board.addEventListener('scroll', run, { passive: true });
-    }
+    if (board) ro.observe(board);
     return () => {
       window.removeEventListener('resize', run);
-      board?.removeEventListener('scroll', run);
       ro.disconnect();
     };
   }, [route]);
@@ -112,7 +108,7 @@ export default function Stack() {
       <h2 className="sec-h disp">{STACK_HEADER.title}</h2>
       <div className="sec-sub">{STACK_HEADER.sub}</div>
 
-      <div className="st-layout">
+      <div className={`st-layout${active ? ' has-selection' : ' is-idle'}`}>
         {/* ---------------- BOARD ---------------- */}
         <div className="board" ref={boardRef} style={{ ['--ac']: ac } as CSSProperties}>
           <div className="bh">
@@ -175,6 +171,16 @@ export default function Stack() {
             now fills the board's height and scrolls inside if it needs to. */}
         <div className="read-col">
           <div className="read" style={{ ['--ac']: ac } as CSSProperties}>
+          {active && (
+            <button
+              type="button"
+              className="read-close"
+              onClick={() => select(null)}
+              aria-label="Return to the stack board"
+            >
+              ◂ BOARD
+            </button>
+          )}
           {!active ? (
             <div className="idle">
               <div className="b disp">{STACK_IDLE.big}</div>

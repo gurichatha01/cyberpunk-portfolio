@@ -211,7 +211,6 @@ export default function Builds() {
 
   /* ============================ DESKTOP ============================ */
   const ac = loaded ? loaded.ac : DEFAULT_AC;
-  const shelf = TAPES.filter((t) => !loaded || t.id !== loaded.id);
   const busy = phase === 'loading' || phase === 'ejecting';
   const slotState: 'loading' | 'seated' | 'ejecting' =
     phase === 'loading' ? 'loading' : phase === 'ejecting' ? 'ejecting' : 'seated';
@@ -301,18 +300,32 @@ export default function Builds() {
           )}
         </div>
 
-        <div className="shelf">
-          <div className="cap">{loaded ? 'OTHER TAPES' : 'SELECT A TAPE'}</div>
+        <div className="shelf" aria-label="Tape rack">
+          <div className="cap">
+            <span>TAPE RACK · 02 SLOTS</span>
+            <b>{loaded ? '01 READY' : '02 READY'}</b>
+          </div>
           <div className="shelfrow">
-            {shelf.map((t) => (
-              <Cassette
-                key={t.id}
-                tape={t}
-                mode="button"
-                disabled={busy}
-                onClick={() => pick(t)}
-              />
-            ))}
+            {TAPES.map((t) => {
+              const inDeck = loaded?.id === t.id;
+              return (
+                <div className={`rack-slot${inDeck ? ' in-deck' : ''}`} key={t.id}>
+                  {inDeck ? (
+                    <div className="rack-empty" aria-label={`${t.name} is in the tape deck`}>
+                      <span>{t.name} · IN DECK</span>
+                      <i>RETURNING ON EJECT</i>
+                    </div>
+                  ) : (
+                    <Cassette
+                      tape={t}
+                      mode="button"
+                      disabled={busy}
+                      onClick={() => pick(t)}
+                    />
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
