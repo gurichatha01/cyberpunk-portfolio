@@ -113,6 +113,8 @@ export function SignalTrace({
   const dimRef = useRef<SVGPathElement>(null);
   const litRef = useRef<SVGPathElement>(null);
   const beamRef = useRef<SVGPathElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const nodeRefs = useRef<(SVGEllipseElement | null)[]>([]);
 
   const seg = eras.length - 1;
   const pos = (i: number) => (i / seg) * ALONG;
@@ -171,8 +173,37 @@ export function SignalTrace({
     };
   }, [eras, vertical, reduced, progress]);
 
+  // `preserveAspectRatio="none"` is intentional for the waveform, but it also
+  // stretches SVG circles. Counter-scale each node on both axes so its
+  // rendered width and height stay equal and its screen size remains stable.
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+
+    const resizeNodes = () => {
+      const { width, height } = svg.getBoundingClientRect();
+      if (width <= 0 || height <= 0) return;
+
+      const scaleX = width / (vertical ? ACROSS : ALONG);
+      const scaleY = height / (vertical ? ALONG : ACROSS);
+
+      nodeRefs.current.forEach((node, index) => {
+        if (!node) return;
+        const radiusPx = index === era ? 7 : 5;
+        node.setAttribute('rx', String(radiusPx / scaleX));
+        node.setAttribute('ry', String(radiusPx / scaleY));
+      });
+    };
+
+    resizeNodes();
+    const observer = new ResizeObserver(resizeNodes);
+    observer.observe(svg);
+    return () => observer.disconnect();
+  }, [era, eras.length, vertical]);
+
   return (
     <svg
+      ref={svgRef}
       className={className}
       viewBox={vertical ? `0 0 ${ACROSS} ${ALONG}` : `0 0 ${ALONG} ${ACROSS}`}
       preserveAspectRatio="none"
@@ -249,11 +280,15 @@ export function SignalTrace({
         const cx = vertical ? CENTRE : pos(i);
         const cy = vertical ? pos(i) : CENTRE;
         const dot = (
-          <circle
+          <ellipse
+            ref={(node) => {
+              nodeRefs.current[i] = node;
+            }}
             className="nodedot"
             cx={cx}
             cy={cy}
-            r={i === era ? 7 : 5}
+            rx={i === era ? 7 : 5}
+            ry={i === era ? 7 : 5}
             fill={i <= era ? e.hex : '#0a0e14'}
             stroke={e.hex}
             strokeWidth="2"

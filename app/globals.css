@@ -1661,7 +1661,7 @@ h1, h2, h3, h4, p {
 .nodedot {
   stroke-width: 2;
   pointer-events: none;
-  transition: r 0.2s, fill 0.2s;
+  transition: rx 0.2s, ry 0.2s, fill 0.2s;
 }
 
 /* horizontal scope (desktop) — grows with the viewport so tall screens get a
@@ -1699,41 +1699,129 @@ h1, h2, h3, h4, p {
 
 /* Laptop-height desktop screens keep the full Journey, but tighten the scope
    and card typography enough that the detail panel remains wholly visible. */
-@media (min-width: 768px) and (max-height: 950px) {
+@media (min-width: 768px) and (max-height: 1100px) {
   .hscope {
-    height: clamp(124px, 16vh, 160px);
+    height: clamp(112px, 14vh, 150px);
   }
   .jr > .scope {
-    margin-bottom: 10px;
-    padding: 9px 12px;
+    margin-bottom: 8px;
+    padding: 8px 12px;
   }
   .jr > .jrow {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
   .jr > .era {
-    padding: 13px 18px;
+    padding: 10px 16px;
   }
   .era .top {
-    margin-bottom: 6px;
+    margin-bottom: 4px;
   }
   .era .org {
-    font-size: 30px;
+    font-size: 28px;
+  }
+  .era .rl {
+    font-size: 10.5px;
   }
   .era p {
-    max-width: 900px;
-    margin-bottom: 8px;
-    font-size: 11.5px;
-    line-height: 1.42;
+    max-width: 1100px;
+    margin-bottom: 6px;
+    font-size: 11px;
+    line-height: 1.36;
   }
   .augh {
-    margin-bottom: 5px;
+    margin-bottom: 4px;
+    font-size: 8px;
+  }
+  .augs {
+    gap: 4px;
   }
   .aug {
-    padding: 4px 7px;
-    font-size: 8.5px;
+    padding: 3px 6px;
+    font-size: 8px;
   }
   .footnote {
-    margin-top: 8px;
+    margin-top: 6px;
+  }
+}
+
+@media (min-width: 768px) and (max-height: 850px) {
+  .hscope {
+    height: 96px;
+  }
+  .shead {
+    margin-bottom: 4px;
+    font-size: 8px;
+  }
+  .jr > .scope {
+    padding-block: 6px;
+  }
+  .jr > .jrow {
+    margin-bottom: 6px;
+    padding-bottom: 0;
+  }
+  .jchip {
+    min-height: 36px;
+    padding: 7px 11px;
+    font-size: 9px;
+  }
+  .jr > .era {
+    padding: 8px 14px;
+  }
+  .era .top {
+    margin-bottom: 2px;
+  }
+  .era .when,
+  .era .dur {
+    font-size: 8px;
+  }
+  .era .org {
+    font-size: 24px;
+  }
+  .era .rl {
+    font-size: 9px;
+  }
+  .era p {
+    margin-bottom: 4px;
+    font-size: 10px;
+    line-height: 1.28;
+  }
+  .augh {
+    margin-bottom: 3px;
+    font-size: 7.5px;
+  }
+  .aug {
+    padding: 2px 5px;
+    font-size: 7.5px;
+  }
+  .jr > .footnote {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) and (max-height: 780px) {
+  .hscope {
+    height: 72px;
+  }
+  .jchip {
+    min-height: 32px;
+    padding: 5px 9px;
+  }
+  .jr > .era {
+    padding: 6px 12px;
+  }
+  .era .org {
+    font-size: 22px;
+  }
+  .era p {
+    margin-bottom: 3px;
+    font-size: 9.5px;
+    line-height: 1.2;
+  }
+  .augh {
+    margin-bottom: 2px;
+  }
+  .aug {
+    padding: 1px 4px;
   }
 }
 
